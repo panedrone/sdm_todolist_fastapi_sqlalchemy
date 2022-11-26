@@ -1,10 +1,11 @@
-from typing import List, Optional
-
 from pydantic import BaseModel
 
 
 class SchemaGroupBase(BaseModel):
     g_name: str
+
+    class Config:
+        orm_mode = True
 
 
 class SchemaGroupCreate(SchemaGroupBase):
@@ -13,9 +14,6 @@ class SchemaGroupCreate(SchemaGroupBase):
 
 class SchemaGroup(SchemaGroupBase):
     g_id: int
-
-    class Config:
-        orm_mode = True
 
 
 class SchemaGroupLi(SchemaGroupBase):

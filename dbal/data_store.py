@@ -310,8 +310,8 @@ class _DS(DataStore):
             # https://stackoverflow.com/questions/31750441/generalised-insert-into-sqlalchemy-using-dictionary
             # https://stackoverflow.com/questions/3451779/how-to-dynamically-create-an-instance-of-a-class-in-python
             # https://stackoverflow.com/questions/1958219/how-to-convert-sqlalchemy-row-object-to-a-python-dict
-            # res = [cls(**dict(row)) for row in cursor]
-            res = [dict(row) for row in cursor]
+            res = [cls(**dict(row)) for row in cursor]
+            # res = [dict(row) for row in cursor]
             return res
         finally:
             cursor.close()
