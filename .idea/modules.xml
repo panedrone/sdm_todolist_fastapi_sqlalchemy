@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/todolist_fastapi_sqlite3.iml" filepath="$PROJECT_DIR$/.idea/todolist_fastapi_sqlite3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/sdm_demo_todolist_fastapi_sqlalchemy.iml" filepath="$PROJECT_DIR$/.idea/sdm_demo_todolist_fastapi_sqlalchemy.iml" />
     </modules>
   </component>
 </project>
