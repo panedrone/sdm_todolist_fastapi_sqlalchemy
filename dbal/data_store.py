@@ -18,7 +18,6 @@ Improvements are welcome: sqldalmaker@gmail.com
 import sqlalchemy.orm
 
 # import cx_Oracle
-from sqlalchemy.orm import Session
 
 
 class OutParam:
@@ -227,7 +226,7 @@ LargeBinary = sqlalchemy.LargeBinary
 #     #     ``DATE`` type supports a time value.
 #     DateTime = oracle.DATE  # (timezone=False)
 
-def create_ds(session: Session) -> DataStore:  # factory
+def create_ds(session: sqlalchemy.orm.Session) -> DataStore:  # factory
     return _DS(session)  # session is constructed by "scoped_session" factory
 
 
@@ -270,7 +269,7 @@ class _DS(DataStore):
     # static field
     # Session: sqlalchemy.orm.scoped_session
 
-    def __init__(self, session: Session):
+    def __init__(self, session: sqlalchemy.orm.Session):
         self.conn = None
         self.transaction = None
         self.engine = None
