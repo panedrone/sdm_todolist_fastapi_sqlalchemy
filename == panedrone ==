@@ -1,0 +1,5 @@
+Building REST APIs using FastAPI, SQLAlchemy & Uvicorn
+https://dassum.medium.com/building-rest-apis-using-fastapi-sqlalchemy-uvicorn-8a163ccf3aa1
+
+Uvicorn is a lightning-fast ASGI server implementation, using uvloop and httptools. It supports HTTP/1.1 and WebSockets. Support for HTTP/2 is planned.
+
