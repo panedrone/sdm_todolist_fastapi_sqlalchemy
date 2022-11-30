@@ -17,6 +17,7 @@ Improvements are welcome: sqldalmaker@gmail.com
 # import flask_sqlalchemy  # remove it for a "not flask" version
 import sqlalchemy.orm
 
+
 # import cx_Oracle
 
 
@@ -33,15 +34,17 @@ class DataStore:
 
     def rollback(self): pass
 
-    # Helpers
+    # ORM-based Helpers
 
-    def filter(self, cls, params=None): pass
+    def filter(self, cls, params: dict = None): pass
 
     def delete_by_filter(self, cls, params=None) -> int: pass
 
-    def get_one_raw(self, cls, params=None): pass
+    def update_by_filter(self, cls, data: dict, params: dict = None) -> int: pass
 
-    def get_all_raw(self, cls, params=None) -> []: pass
+    def get_one_raw(self, cls, params: dict = None): pass
+
+    def get_all_raw(self, cls, params: dict = None) -> []: pass
 
     # ORM-based CRUD
 
@@ -49,11 +52,11 @@ class DataStore:
 
     def read_all(self, cls) -> []: pass
 
-    def read_one(self, cls, params=None): pass
+    def read_one(self, cls, params: dict = None): pass
 
     def update_one(self, instance): pass
 
-    def delete_one(self, cls, params=None) -> int: pass
+    def delete_one(self, cls, params: dict = None) -> int: pass
 
     # ORM-based methods for raw-SQL
 
@@ -225,6 +228,11 @@ LargeBinary = sqlalchemy.LargeBinary
 #     #     :class:`_types.DateTime`; this is to suit the fact that the Oracle
 #     #     ``DATE`` type supports a time value.
 #     DateTime = oracle.DATE  # (timezone=False)
+#
+#     String = oracle.NVARCHAR2
+#     Boolean = oracle.LONG
+#     LargeBinary = oracle.BLOB
+
 
 def create_ds(session: sqlalchemy.orm.Session) -> DataStore:  # factory
     return _DS(session)  # session is constructed by "scoped_session" factory
@@ -372,6 +380,10 @@ class _DS(DataStore):
         #  :return: the count of rows matched as returned by the database's
         #           "row count" feature.
         return found.delete()  # found is a BaseQuery, no fetch!
+
+    def update_by_filter(self, cls, data: dict, params: dict = None) -> int:
+        found = self.filter(cls, params)
+        return found.update(values=data)  # found is a BaseQuery, no fetch!
 
     def create_one(self, instance) -> None:
         self.session.add(instance)  # return None

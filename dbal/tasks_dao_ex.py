@@ -17,4 +17,4 @@ class TasksDaoEx(_TasksDao):
         return tasks
 
     def update_task(self, t_id, data: dict):
-        self.ds.filter(Task, {'t_id': t_id}).update(values=data)
+        self.ds.update_by_filter(Task, data, {'t_id': t_id})
