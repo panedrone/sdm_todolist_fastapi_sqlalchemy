@@ -62,18 +62,18 @@ class DataStore:
 
     # === raw-SQL INSERT is not used with sqlalchemy: def insert_row(self, sql, params, ai_values): pass
 
-    def exec_dml(self, sql, params):
+    def exec_dml(self, sql, params) -> int:
         """
-        :param sql: str
-        :param params: (array, optional): Values of SQL parameters
+        :param sql: str, SQL statement
+        :param params: dict, optional, SQL parameters
         :return: int: amount of affected rows
         """
         pass
 
     def query_scalar(self, sql, params):
         """
-        :param sql: str
-        :param params: (array, optional), values of SQL parameters
+        :param sql: str, SQL statement
+        :param params: dict, optional, SQL parameters
         :return single scalar value
         :raise Exception: if amount of fetched rows != 1
         """
@@ -81,16 +81,16 @@ class DataStore:
 
     def query_all_scalars(self, sql, params) -> []:
         """
-        :param sql: str
-        :param params: (array, optional), values of SQL parameters
+        :param sql: str, SQL statement
+        :param params: dict, optional, SQL parameters
         :return array of scalar values
         """
         pass
 
     def query_row(self, sql, params):
         """
-        :param sql: str
-        :param params: (array, optional), values of SQL parameters
+        :param sql: str, SQL statement
+        :param params: dict, optional, SQL parameters
         :return single fetched row
         :raise Exception: if amount of rows != 1
         """
@@ -98,8 +98,8 @@ class DataStore:
 
     def query_all_rows(self, sql, params, callback):
         """
-        :param sql: str
-        :param params: (array, optional), values of SQL parameters.
+        :param sql: str, SQL statement
+        :param params: dict, optional, SQL parameters.
         :param callback: а function delivering fetched rows to caller
         :return: None
         """
