@@ -6,7 +6,7 @@
         <create/>
 <!--        <read-all/>-->
         <read/>
-<!--        <update/>-->
+        <update/>
         <delete/>
     </crud>
 

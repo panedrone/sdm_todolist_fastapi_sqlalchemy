@@ -15,6 +15,3 @@ class TasksDaoEx(_TasksDao):
     def get_tasks_by_group(self, g_id):
         tasks = self.ds.filter(Task, {'g_id': g_id}).order_by(Task.t_date, Task.t_id).all()
         return tasks
-
-    def update_task(self, t_id, data: dict):
-        self.ds.update_by_filter(Task, data, {'t_id': t_id})

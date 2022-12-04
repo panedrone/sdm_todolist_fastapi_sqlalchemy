@@ -1,17 +1,18 @@
 """
-This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
-It demonstrates how to implement interface DataStore in Python + SQLAlchemy.
-More about DataStore: https://sqldalmaker.sourceforge.net/data_store.html
-Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
+    This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
+    It demonstrates how to implement an interface DataStore in Python + SQLAlchemy.
+    More about DataStore: https://sqldalmaker.sourceforge.net/data_store.html
+    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
 
-Successfully tested with:
-    - sqlite3 ---------------- built-in
-    - postgresql ------------- pip install psycopg2
-    - mysql+mysqlconnector --- pip install mysql-connector-python
-    - cx_Oracle -------------- pip install cx_oracle
+    Successfully tested with:
+        - sqlite3 ---------------- built-in
+        - postgresql ------------- pip install psycopg2
+        - mysql+mysqlconnector --- pip install mysql-connector-python
+        - cx_Oracle -------------- pip install cx_oracle
 
-Copy-paste this code to your project and change it for your needs.
-Improvements are welcome: sqldalmaker@gmail.com
+    Copy-paste it to your project and change it for your needs.
+    Improvements are welcome: sqldalmaker@gmail.com
+
 """
 
 # import flask_sqlalchemy  # remove it for a "not flask" version
@@ -34,29 +35,91 @@ class DataStore:
 
     def rollback(self): pass
 
-    # ORM-based Helpers
+    # ORM-based raw-SQL helpers
 
-    def filter(self, cls, params: dict = None): pass
+    def get_one_raw(self, cls, params=None):
+        """
+        :param cls: a model class containing static field SQL
+        :param params: a tuple of SQL params
+        :return: a model object
+        """
+        pass
 
-    def delete_by_filter(self, cls, params=None) -> int: pass
+    def get_all_raw(self, cls, params=None) -> []:
+        """
+        :param cls: a model class containing static field SQL
+        :param params: a tuple of SQL params
+        :return: an array of model objects
+        """
+        pass
 
-    def update_by_filter(self, cls, data: dict, params: dict = None) -> int: pass
+    # ORM-based helpers
 
-    def get_one_raw(self, cls, params: dict = None): pass
+    def filter(self, cls, params: dict):
+        """
+        :param cls: a model class
+        :param params: dict of named filter params
+        :return: a QuerySet
+        """
+        pass
 
-    def get_all_raw(self, cls, params: dict = None) -> []: pass
+    def delete_by_filter(self, cls, params: dict) -> int:
+        """
+        :param cls: a model class
+        :param params: dict of named filter params
+        :return: amount of rows affected
+        """
+        pass
+
+    def update_by_filter(self, cls, data: dict, params: dict) -> int:
+        """
+        :param cls: a model class
+        :param data: dict of column-value to update
+        :param params: dict of filter params
+        :return: amount of rows affected
+        """
+        pass
 
     # ORM-based CRUD
 
-    def create_one(self, instance) -> None: pass
+    def create_one(self, entity) -> None:
+        """
+        :param obj: a model object or serializer object
+        :return: None
+        """
+        pass
 
-    def read_all(self, cls) -> []: pass
+    def read_all(self, cls) -> []:
+        """
+        :param cls: a model class
+        :return: a list model objects
+        """
+        pass
 
-    def read_one(self, cls, params: dict = None): pass
+    def read_one(self, cls, pk: dict):
+        """
+        :param cls: a model class
+        :param pk: primary key as a dict of column-value pairs
+        :return: a model object
+        """
+        pass
 
-    def update_one(self, instance): pass
+    def update_one(self, cls, data: dict, pk: dict) -> int:
+        """
+        :param cls: model class
+        :param data: dict of column-value to update
+        :param pk: primary key as a dict of column-value pairs
+        :return: int, amount of rows affected
+        """
+        pass
 
-    def delete_one(self, cls, params: dict = None) -> int: pass
+    def delete_one(self, cls, pk: dict) -> int:
+        """
+        :param cls: model class
+        :param pk: primary key as a dict of column-value pairs
+        :return: int, amount of rows affected
+        """
+        pass
 
     # ORM-based methods for raw-SQL
 
@@ -368,40 +431,38 @@ class _DS(DataStore):
             raise Exception('More than 1 row exists')
         return rows[0]
 
-    def filter(self, cls, params=None):
-        if params:
-            found = self.session.query(cls).filter_by(**params)
-        else:
-            found = self.session.query(cls)
-        return found
+    def filter(self, cls, params: dict):
+        return self.session.query(cls).filter_by(**params)
 
-    def delete_by_filter(self, cls, params=None) -> int:
+    def delete_by_filter(self, cls, params: dict) -> int:
         found = self.filter(cls, params)
         #  :return: the count of rows matched as returned by the database's
         #           "row count" feature.
         return found.delete()  # found is a BaseQuery, no fetch!
 
-    def update_by_filter(self, cls, data: dict, params: dict = None) -> int:
+    def update_by_filter(self, cls, data: dict, params: dict) -> int:
         found = self.filter(cls, params)
         return found.update(values=data)  # found is a BaseQuery, no fetch!
 
-    def create_one(self, instance) -> None:
-        self.session.add(instance)  # return None
+    def create_one(self, entity) -> None:
+        self.session.add(entity)  # return None
         self.session.flush()
 
-    def read_all(self, cls) -> []:
+    def read_all(self, cls):
         return self.session.query(cls).all()
 
-    def read_one(self, cls, params=None):
-        return self.session.query(cls).get(params)
+    def read_one(self, cls, pk: dict):
+        return self.session.query(cls).get(pk)
 
-    def update_one(self, instance):
+    def update_one(self, cls, data: dict, pk: dict) -> int:
+        rc = self.update_by_filter(cls, data, pk)
         self.session.flush()
+        return rc
 
-    def delete_one(self, cls, params=None) -> int:
+    def delete_one(self, cls, pk: dict) -> int:
         # found = self.read_one(cls, params) # found is an entity of class cls
         # self.session.delete(found)
-        rc = self.delete_by_filter(cls, params)  # no fetch!
+        rc = self.delete_by_filter(cls, pk)  # no fetch!
         self.session.flush()
         return rc
 

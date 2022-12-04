@@ -22,8 +22,8 @@ from dbal.groups_dao_ex import GroupsDaoEx
 from dbal.task import Task
 from dbal.tasks_dao_ex import TasksDaoEx
 
-app = FastAPI(title="Sample FastAPI Application",
-              description="Sample FastAPI Application with Swagger and Sqlalchemy",
+app = FastAPI(title="SDM + FastAPI Application",
+              description="SDM + FastAPI Application with Sqlalchemy",
               version="1.0.0", )
 
 # https://stackoverflow.com/questions/65916537/a-minimal-fastapi-example-loading-index-html

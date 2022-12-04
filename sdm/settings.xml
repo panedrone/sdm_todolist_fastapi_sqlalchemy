@@ -4,9 +4,9 @@
 
     <folders target="dbal" sql="sdm/sql"/>
 
-    <dto scope="" inheritance="" field-names-mode="0" macro="sdm/python.vm"/>
+    <dto scope="" inheritance="" field-names-mode="0" macro=""/>
 
-    <dao scope="" field-assign-mode="0" macro="sdm/python.vm"/>
+    <dao scope="" field-assign-mode="0" macro=""/>
 
     <ide event-log="true"/>
 

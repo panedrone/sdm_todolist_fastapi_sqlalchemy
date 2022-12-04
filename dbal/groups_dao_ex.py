@@ -13,4 +13,4 @@ class GroupsDaoEx(_GroupsDao):
         super().__init__(ds)
 
     def rename(self, g_id, g_name):
-        self.ds.filter(Group, {'g_id': g_id}).update(values={'g_name': g_name})
+        self.ds.update_by_filter(Group, {'g_id': g_id}, {'g_name': g_name})
