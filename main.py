@@ -55,7 +55,7 @@ async def add_process_time_header(request, call_next):
 
 @app.get('/api/groups', tags=["GroupList"], response_model=List[schemas.SchemaGroupLi])
 def get_all_groups(ds: DataStore = Depends(get_ds)):
-    return ds.get_all_raw(GroupLi)
+    return GroupsDaoEx(ds).get_all_groups()
 
 
 @app.post('/api/groups', tags=["GroupList"], response_model=schemas.SchemaGroup, status_code=201)

@@ -84,7 +84,7 @@ class DataStore:
 
     def create_one(self, entity) -> None:
         """
-        :param obj: a model object or serializer object
+        :param entity: a model object or serializer object
         :return: None
         """
         pass
