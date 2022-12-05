@@ -17,7 +17,6 @@ import schemas
 from db import get_ds
 from dbal.data_store import DataStore
 from dbal.group import Group
-from dbal.group_li import GroupLi
 from dbal.groups_dao_ex import GroupsDaoEx
 from dbal.task import Task
 from dbal.tasks_dao_ex import TasksDaoEx
