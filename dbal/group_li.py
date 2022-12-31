@@ -7,6 +7,9 @@ from .data_store import *
 
 
 class GroupLi(Base):
+    """
+    Group list item
+    """
     __abstract__ = True
 
     g_id = Column('g_id', autoincrement=True)
