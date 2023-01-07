@@ -4,29 +4,31 @@ from pydantic import BaseModel, validator
 
 
 class _SchemaGroupBase(BaseModel):
-    g_name: str
-
-    @validator('g_name')
-    def validator_g_name(cls, v):
-        # https://github.com/pydantic/pydantic/issues/1223
-        if not v:
-            raise Exception('Group name may not be empty')
-        return v
-
     class Config:
         orm_mode = True
 
 
-class SchemaGroupCreate(_SchemaGroupBase):
-    pass
+class SchemaGroupCreateUpdate(_SchemaGroupBase):
+    g_name: str
+
+    # @classmethod  # -------- don't use with @validator!!!
+    @validator('g_name')
+    def validate_g_name(cls, v):
+        # https://github.com/pydantic/pydantic/issues/1223
+        # https://levelup.gitconnected.com/how-to-validate-your-data-with-custom-validators-of-pydantic-models-743561a4ab53
+        if not v:
+            raise ValueError('Group name may not be empty')
+        return v
 
 
 class SchemaGroup(_SchemaGroupBase):
     g_id: int
+    g_name: str
 
 
 class SchemaGroupLi(_SchemaGroupBase):
     g_id: int
+    g_name: str
     g_tasks_count: int
 
 
@@ -35,10 +37,11 @@ class SchemaGroupLi(_SchemaGroupBase):
 class _SchemaTaskBase(BaseModel):
     t_subject: str
 
+    # @classmethod  # -------- don't use with @validator!!!
     @validator('t_subject')
-    def validator_t_subject(cls, v):
+    def validate_t_subject(cls, v):
         if not v:
-            raise Exception('Task subject may not be empty')
+            raise ValueError('Task subject may not be empty')
         return v
 
     class Config:
@@ -60,12 +63,13 @@ class SchemaTaskEdit(_SchemaTaskBase):
     t_date: str
     t_comments: str
 
+    # @classmethod  # -------- don't use with @validator!!!
     @validator('t_date')
-    def validator_t_date(cls, v):
+    def validate_t_date(cls, v):
         if not v:
             raise Exception('Task date may not be empty')
         try:
             datetime.strptime(v, '%Y-%m-%d').date()
         except Exception:
-            raise Exception("Task date format expected like '2022-12-31'")
+            raise ValueError("Task date format expected like '2022-12-31'")
         return v

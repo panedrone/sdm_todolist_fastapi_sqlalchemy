@@ -17,4 +17,4 @@ class GroupsDaoEx(_GroupsDao):
         return self.ds.get_all_raw(GroupLi)
 
     def rename(self, g_id, g_name):
-        self.ds.update_by_filter(Group, {'g_id': g_id}, {'g_name': g_name})
+        self.ds.update_by_filter(Group, data={'g_name': g_name}, params={'g_id': g_id})

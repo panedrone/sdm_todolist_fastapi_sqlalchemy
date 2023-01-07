@@ -379,6 +379,7 @@ class _DS(DataStore):
 
     def commit(self):
         if self.transaction is None:
+            self.session.flush()
             self.session.commit()
             return
         # https://docs.sqlalchemy.org/en/14/core/connections.html
