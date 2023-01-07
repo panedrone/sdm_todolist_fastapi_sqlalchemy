@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/static/styles.css" type="text/css"/>
     <link rel="icon" href="data:;base64,=">
-    <title>SDM + Flask-SQLAlchemy + SQLite3</title>
+    <title>SDM + FastAPI + SQLite3</title>
     <script>
         const JSON_HEADERS = {
             'Accept': 'application/json',
@@ -57,8 +57,8 @@
             if (response.status === 201) {
                 renderGroups();
             } else {
-                let text = await response.text()
-                alert(response.status + "\n" + text);
+                let j = await response.json()
+                alert(response.status + "\n" + j.detail[0].msg);
             }
         }
 
@@ -70,8 +70,8 @@
             if (response.status === 200) {
                 renderGroups();
             } else {
-                let text = await response.text()
-                alert(response.status + "\n" + text);
+                let j = await response.json()
+                alert(response.status + "\n" + j.detail[0].msg);
             }
         }
 
@@ -151,8 +151,8 @@
                 renderGroups(); // update tasks count
                 renderGroupDetails(g_id);
             } else {
-                let text = await response.text()
-                alert(response.status + "\n" + text);
+                let j = await response.json()
+                alert(response.status + "\n" + j.detail[0].msg);
             }
         }
 
