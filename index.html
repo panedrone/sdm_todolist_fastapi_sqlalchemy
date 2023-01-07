@@ -6,231 +6,232 @@
     <link rel="icon" href="data:;base64,=">
     <title>SDM + Flask-SQLAlchemy + SQLite3</title>
     <script>
-            const JSON_HEADERS = {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            };
+        const JSON_HEADERS = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        };
 
-            function renderGroups() {
-                let groupsTable = document.getElementById("groups_table");
-                fetch("/api/groups")
-                        .then(response => response.json())
-                        .then(groupList => {
-                            while (groupsTable.rows.length > 1) {
-                                groupsTable.deleteRow(1);
-                            }
-                            groupList.forEach(group => {
-                                let row = document.createElement("tr");
-                                let td1 = document.createElement("td");
-                                let a = document.createElement("a");
-                                a.href = 'javascript:renderGroupDetails(' + group.g_id + ');';
-                                a.innerHTML = group.g_name;
-                                td1.appendChild(a);
-                                let td2 = document.createElement("td");
-                                td2.className = "center";
-                                td2.innerHTML = group.g_tasks_count;
-                                row.appendChild(td1);
-                                row.appendChild(td2);
-                                groupsTable.appendChild(row);
-                            });
-                        });
+        function renderGroups() {
+            let groupsTable = document.getElementById("groups_table");
+            fetch("/api/groups")
+                .then(response => response.json())
+                .then(groupList => {
+                    while (groupsTable.rows.length > 1) {
+                        groupsTable.deleteRow(1);
+                    }
+                    groupList.forEach(group => {
+                        let row = document.createElement("tr");
+                        let td1 = document.createElement("td");
+                        let a = document.createElement("a");
+                        a.href = 'javascript:renderGroupDetails(' + group.g_id + ');';
+                        if (group.g_name === "")
+                            group.g_name = "_"
+                        a.innerHTML = group.g_name;
+                        td1.appendChild(a);
+                        let td2 = document.createElement("td");
+                        td2.className = "center";
+                        td2.innerHTML = group.g_tasks_count;
+                        row.appendChild(td1);
+                        row.appendChild(td2);
+                        groupsTable.appendChild(row);
+                    });
+                });
+        }
+
+        function renderGroupDetails(g_id) {
+            fetch("/api/groups/" + g_id)
+                .then(response => response.json())
+                .then(group => {
+                    let g_name = document.getElementById("g_name2");
+                    g_name.value = group.g_name;
+                    showGroupDetails();
+                    hideTaskDetails();
+                });
+            document.getElementById("curr_g_id").value = g_id;
+            renderGroupTasks(g_id);
+        }
+
+        async function createGroup() {
+            let json = formToJson("form_create_group");
+            let response = await fetch("/api/groups", {method: 'post', headers: JSON_HEADERS, body: json});
+            if (response.status === 201) {
+                renderGroups();
+            } else {
+                let text = await response.text()
+                alert(response.status + "\n" + text);
             }
+        }
 
-            function renderGroupDetails(g_id) {
-                fetch("/api/groups/" + g_id)
-                        .then(response => response.json())
-                        .then(group => {
-                            let g_name = document.getElementById("g_name2");
-                            g_name.value = group.g_name;
-                            showGroupDetails();
-                            hideTaskDetails();
-                        });
-                document.getElementById("curr_g_id").value = g_id;
-                renderGroupTasks(g_id);
+        async function updateGroup() {
+            let g_id = document.getElementById("curr_g_id").value;
+            let json = formToJson("form_update_group");
+            // alert(json)
+            let response = await fetch("/api/groups/" + g_id, {method: 'put', headers: JSON_HEADERS, body: json})
+            if (response.status === 200) {
+                renderGroups();
+            } else {
+                let text = await response.text()
+                alert(response.status + "\n" + text);
             }
+        }
 
-            function createGroup() {
-                let json = formToJson("form_create_group");
-                fetch("/api/groups", {method: 'post', headers: JSON_HEADERS, body: json})
-                        .then(response => response.status)
-                        .then(status => {
-                            if (status === 201) {
-                                renderGroups();
-                            } else {
-                                alert(status);
-                            }
-                        });
-            }
-
-            function updateGroup() {
-                let g_id = document.getElementById("curr_g_id").value;
-                let json = formToJson("form_update_group");
-                // alert(json)
-                fetch("/api/groups/" + g_id, {method: 'put', headers: JSON_HEADERS, body: json})
-                        .then(response => response.status)
-                        .then(status => {
-                            if (status === 200) {
-                                renderGroups();
-                            } else {
-                                alert(status);
-                            }
-                        });
-            }
-
-            function deleteGroup() {
-                let g_id = document.getElementById("curr_g_id").value;
-                fetch("/api/groups/" + g_id, {method: 'delete'})
-                        .then(response => response.status)
-                        .then(status => {
-                            if (status === 204) {
-                                hideTaskDetails();
-                                hideGroupDetails();
-                                renderGroups();
-                            } else {
-                                alert(status);
-                            }
-                        });
-            }
-
-            function renderTaskDetails(t_id) {
-                document.getElementById("curr_t_id").value = t_id;
-                fetch("/api/tasks/" + t_id)
-                        .then(response => response.json())
-                        .then(task => {
-                            let subj = document.getElementById("subj");
-                            subj.innerText = task.t_subject;
-                            let t_date = document.getElementById("t_date");
-                            t_date.value = task.t_date;
-                            let t_subject = document.getElementById("t_subject");
-                            t_subject.value = task.t_subject;
-                            let t_priority = document.getElementById("t_priority");
-                            t_priority.value = task.t_priority;
-                            let t_comments = document.getElementById("t_comments");
-                            t_comments.value = task.t_comments;
-                            showTaskDetails();
-                        });
-            }
-
-            function renderGroupTasks(g_id) {
-                let tasksTable = document.getElementById("tasks_table");
-                fetch("/api/groups/" + g_id + "/tasks")
-                        .then(response => response.json())
-                        .then(taskList => {
-                            while (tasksTable.rows.length > 1) {
-                                tasksTable.deleteRow(1);
-                            }
-                            taskList.forEach(task => {
-                                let row = document.createElement("tr");
-                                let td1 = document.createElement("td");
-                                td1.innerHTML = task.t_date;
-                                let td2 = document.createElement("td");
-                                let a = document.createElement("a");
-                                a.href = 'javascript:renderTaskDetails(' + task.t_id + ');';
-                                a.innerHTML = task.t_subject;
-                                td2.appendChild(a);
-                                let td3 = document.createElement("td");
-                                td3.className = "center";
-                                td3.innerHTML = task.t_priority;
-                                row.appendChild(td1);
-                                row.appendChild(td2);
-                                row.appendChild(td3);
-                                tasksTable.appendChild(row);
-                            });
-                        });
-            }
-
-            function taskCreate() {
-                let g_id = document.getElementById("curr_g_id").value;
-                let json = formToJson("form_create_task");
-                fetch("/api/groups/" + g_id + "/tasks", {method: 'post', headers: JSON_HEADERS, body: json})
-                        .then(response => response.status)
-                        .then(status => {
-                            if (status === 201) {
-                                renderGroups(); // update tasks count
-                                renderGroupDetails(g_id);
-                            } else {
-                                alert(status);
-                            }
-                        });
-            }
-
-            function updateTask() {
-                let g_id = document.getElementById("curr_g_id").value;
-                let t_id = document.getElementById("curr_t_id").value;
-                let json = formToJson("form_task_details", function (object) {
-                    // alert(object)
-                    if (!isNaN(object["t_priority"])) {
-                        object["t_priority"] = parseInt(object["t_priority"]);
+        function deleteGroup() {
+            let g_id = document.getElementById("curr_g_id").value;
+            fetch("/api/groups/" + g_id, {method: 'delete'})
+                .then(response => response.status)
+                .then(status => {
+                    if (status === 204) {
+                        hideTaskDetails();
+                        hideGroupDetails();
+                        renderGroups();
+                    } else {
+                        alert(status);
                     }
                 });
-                fetch("/api/tasks/" + t_id, {method: 'put', headers: JSON_HEADERS, body: json})
-                        .then(response => response.status)
-                        .then(status => {
-                            if (status === 200) {
-                                renderGroupTasks(g_id);
-                                renderTaskDetails(t_id);
-                            } else {
-                                alert(status);
-                            }
-                        });
-            }
+        }
 
-            function taskDelete() {
-                let g_id = document.getElementById("curr_g_id").value;
-                let t_id = document.getElementById("curr_t_id").value;
-                fetch("/api/tasks/" + t_id, {method: "delete"})
-                        .then(response => response.status)
-                        .then(status => {
-                            if (status === 200) {
-                                hideTaskDetails();
-                                renderGroupDetails(g_id);
-                            } else {
-                                alert(status);
-                            }
-                        });
-            }
+        function renderTaskDetails(t_id) {
+            document.getElementById("curr_t_id").value = t_id;
+            fetch("/api/tasks/" + t_id)
+                .then(response => response.json())
+                .then(task => {
+                    let subj = document.getElementById("subj");
+                    subj.innerText = task.t_subject;
+                    let t_date = document.getElementById("t_date");
+                    t_date.value = task.t_date;
+                    let t_subject = document.getElementById("t_subject");
+                    t_subject.value = task.t_subject;
+                    let t_priority = document.getElementById("t_priority");
+                    t_priority.value = task.t_priority;
+                    let t_comments = document.getElementById("t_comments");
+                    t_comments.value = task.t_comments;
+                    showTaskDetails();
+                });
+        }
 
-            function hideTaskDetails() {
-                let form = document.getElementById("form_task_details");
-                form.style.visibility = "hidden";
-            }
+        function renderGroupTasks(g_id) {
+            let tasksTable = document.getElementById("tasks_table");
+            fetch("/api/groups/" + g_id + "/tasks")
+                .then(response => response.json())
+                .then(taskList => {
+                    while (tasksTable.rows.length > 1) {
+                        tasksTable.deleteRow(1);
+                    }
+                    taskList.forEach(task => {
+                        let row = document.createElement("tr");
+                        let td1 = document.createElement("td");
+                        td1.innerHTML = task.t_date;
+                        let td2 = document.createElement("td");
+                        let a = document.createElement("a");
+                        a.href = 'javascript:renderTaskDetails(' + task.t_id + ');';
+                        if (task.t_subject === "")
+                            task.t_subject = "_"
+                        a.innerHTML = task.t_subject;
+                        td2.appendChild(a);
+                        let td3 = document.createElement("td");
+                        td3.className = "center";
+                        td3.innerHTML = task.t_priority;
+                        row.appendChild(td1);
+                        row.appendChild(td2);
+                        row.appendChild(td3);
+                        tasksTable.appendChild(row);
+                    });
+                });
+        }
 
-            function showTaskDetails() {
-                let form = document.getElementById("form_task_details");
-                form.style.visibility = "visible";
+        async function taskCreate() {
+            let g_id = document.getElementById("curr_g_id").value;
+            let json = formToJson("form_create_task");
+            let response = await fetch("/api/groups/" + g_id + "/tasks", {
+                method: 'post',
+                headers: JSON_HEADERS,
+                body: json
+            })
+            if (response.status === 201) {
+                renderGroups(); // update tasks count
+                renderGroupDetails(g_id);
+            } else {
+                let text = await response.text()
+                alert(response.status + "\n" + text);
             }
+        }
 
-            function hideGroupDetails() {
-                let group_details = document.getElementById("group_details");
-                group_details.style.visibility = "hidden";
-            }
-
-            function hideGroupDetails2() {
-                let group_details = document.getElementById("group_details");
-                group_details.style.visibility = "hidden";
-                hideTaskDetails();
-            }
-
-            function showGroupDetails() {
-                let group_details = document.getElementById("group_details");
-                group_details.style.visibility = "visible";
-            }
-
-            function formToJson(formId, preprocess_cb = null) {
-                // https://stackoverflow.com/questions/29775797/fetch-post-json-data
-                let form = document.forms.namedItem(formId);
-                let formData = new FormData(form);
-                let object = {};
-                formData.forEach((value, key) => object[key] = value);
-                if (preprocess_cb) {
-                    preprocess_cb(object);
+        async function updateTask() {
+            let g_id = document.getElementById("curr_g_id").value;
+            let t_id = document.getElementById("curr_t_id").value;
+            let json = formToJson("form_task_details", function (object) {
+                // alert(object)
+                if (!isNaN(object["t_priority"])) {
+                    object["t_priority"] = parseInt(object["t_priority"]);
                 }
-                return JSON.stringify(object);
-            }
-
-            document.addEventListener('DOMContentLoaded', function () {
-                renderGroups();
             });
+            let response = await fetch("/api/tasks/" + t_id, {method: 'put', headers: JSON_HEADERS, body: json})
+            if (response.status === 200) {
+                renderGroupTasks(g_id);
+                renderTaskDetails(t_id);
+            } else {
+                let text = await response.text()
+                alert(response.status + "\n" + text);
+            }
+        }
+
+        function taskDelete() {
+            let g_id = document.getElementById("curr_g_id").value;
+            let t_id = document.getElementById("curr_t_id").value;
+            fetch("/api/tasks/" + t_id, {method: "delete"})
+                .then(response => response.status)
+                .then(status => {
+                    if (status === 200) {
+                        hideTaskDetails();
+                        renderGroupDetails(g_id);
+                    } else {
+                        alert(status);
+                    }
+                });
+        }
+
+        function hideTaskDetails() {
+            let form = document.getElementById("form_task_details");
+            form.style.visibility = "hidden";
+        }
+
+        function showTaskDetails() {
+            let form = document.getElementById("form_task_details");
+            form.style.visibility = "visible";
+        }
+
+        function hideGroupDetails() {
+            let group_details = document.getElementById("group_details");
+            group_details.style.visibility = "hidden";
+        }
+
+        function hideGroupDetails2() {
+            let group_details = document.getElementById("group_details");
+            group_details.style.visibility = "hidden";
+            hideTaskDetails();
+        }
+
+        function showGroupDetails() {
+            let group_details = document.getElementById("group_details");
+            group_details.style.visibility = "visible";
+        }
+
+        function formToJson(formId, preprocess_cb = null) {
+            // https://stackoverflow.com/questions/29775797/fetch-post-json-data
+            let form = document.forms.namedItem(formId);
+            let formData = new FormData(form);
+            let object = {};
+            formData.forEach((value, key) => object[key] = value);
+            if (preprocess_cb) {
+                preprocess_cb(object);
+            }
+            return JSON.stringify(object);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            renderGroups();
+        });
+
 
     </script>
 </head>
