@@ -181,7 +181,7 @@
             fetch("/api/tasks/" + t_id, {method: "delete"})
                 .then(response => response.status)
                 .then(status => {
-                    if (status === 200) {
+                    if (status === 204) {
                         hideTaskDetails();
                         renderGroupDetails(g_id);
                     } else {

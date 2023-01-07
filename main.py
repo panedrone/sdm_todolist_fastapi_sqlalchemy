@@ -75,7 +75,7 @@ def group_read(g_id: int, ds: DataStore = Depends(get_ds)):
 
 
 @app.put('/api/groups/{g_id}', tags=["Group"])
-async def group_update(g_id: int, item_request: schemas.SchemaGroupBase, ds: DataStore = Depends(get_ds)):
+async def group_update(g_id: int, item_request: schemas.SchemaGroup, ds: DataStore = Depends(get_ds)):
     GroupsDaoEx(ds).rename(g_id, item_request.g_name)
     ds.commit()
 
@@ -92,7 +92,7 @@ def group_tasks(g_id: int, ds: DataStore = Depends(get_ds)):
 
 
 @app.post('/api/groups/{g_id}/tasks', tags=["GroupTaskLI"], status_code=201)
-async def task_create(g_id: int, item_request: schemas.SchemaCreateTask, ds: DataStore = Depends(get_ds)):
+async def task_create(g_id: int, item_request: schemas.SchemaTaskCreate, ds: DataStore = Depends(get_ds)):
     j = jsonable_encoder(item_request)
     task = Task()
     task.g_id = g_id
@@ -106,19 +106,19 @@ async def task_create(g_id: int, item_request: schemas.SchemaCreateTask, ds: Dat
     ds.commit()
 
 
-@app.get('/api/tasks/{t_id}', tags=["Task"], response_model=schemas.SchemaEditTask)
+@app.get('/api/tasks/{t_id}', tags=["Task"], response_model=schemas.SchemaTaskEdit)
 def task_read(t_id: int, ds: DataStore = Depends(get_ds)):
     return TasksDaoEx(ds).read_task(t_id)
 
 
 @app.put('/api/tasks/{t_id}', tags=["Task"])
-async def task_update(t_id: int, item_request: schemas.SchemaEditTask, ds: DataStore = Depends(get_ds)):
+async def task_update(t_id: int, item_request: schemas.SchemaTaskEdit, ds: DataStore = Depends(get_ds)):
     j = jsonable_encoder(item_request)
     TasksDaoEx(ds).update_task(t_id, j)
     ds.commit()
 
 
-@app.delete('/api/tasks/{t_id}', tags=["Task"])
+@app.delete('/api/tasks/{t_id}', tags=["Task"], status_code=204)
 async def task_delete(t_id: int, ds: DataStore = Depends(get_ds)):
     TasksDaoEx(ds).delete_task(t_id)
     ds.commit()
