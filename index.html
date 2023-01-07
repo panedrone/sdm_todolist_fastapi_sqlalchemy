@@ -151,8 +151,8 @@
                 renderGroups(); // update tasks count
                 renderGroupDetails(g_id);
             } else {
-                let j = await response.json()
-                alert(response.status + "\n" + j.detail[0].msg);
+                let text = await response.text()
+                alert(response.status + "\n" + text);
             }
         }
 
