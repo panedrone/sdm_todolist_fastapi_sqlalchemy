@@ -69,10 +69,10 @@ class SchemaTaskEdit(_SchemaTaskBase):
         if not v:
             raise Exception('Task date may not be empty')
         try:
-            datetime.strptime(v, '%Y-%m-%d').date()
+            dt = datetime.strptime(v, '%Y-%m-%d').date()
+            return str(dt)  # 2020-4-8 becomes 2020-04-08
         except Exception:
             raise ValueError("Task date format expected like '2022-12-31'")
-        return v
 
     # @classmethod  # -------- don't use with @validator!!!
     @validator('t_priority')
