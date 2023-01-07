@@ -73,3 +73,10 @@ class SchemaTaskEdit(_SchemaTaskBase):
         except Exception:
             raise ValueError("Task date format expected like '2022-12-31'")
         return v
+
+    # @classmethod  # -------- don't use with @validator!!!
+    @validator('t_priority')
+    def validate_t_priority(cls, v):
+        if v < 1 or v > 10:
+            raise Exception('Task priority should be an integer of range 1..10')
+        return v
