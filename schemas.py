@@ -78,5 +78,5 @@ class SchemaTaskEdit(_SchemaTaskBase):
     @validator('t_priority')
     def validate_t_priority(cls, v):
         if v < 1 or v > 10:
-            raise Exception('Task priority should be an integer of range 1..10')
+            raise Exception('Task priority should be an integer in the range 1..10')
         return v

@@ -1,15 +1,11 @@
+import time
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
-
-import time
-import asyncio
-
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
@@ -59,13 +55,10 @@ def get_all_groups(ds: DataStore = Depends(get_ds)):
 
 @app.post('/api/groups', tags=["GroupList"], status_code=201)
 async def group_create(item_request: schemas.SchemaGroupCreateUpdate, ds: DataStore = Depends(get_ds)):
-    async def do_create():
-        g_dao = GroupsDaoEx(ds)
-        group = Group(g_name=item_request.g_name)
-        g_dao.create_group(group)
-        ds.commit()
-
-    return await do_create()
+    g_dao = GroupsDaoEx(ds)
+    group = Group(g_name=item_request.g_name)
+    g_dao.create_group(group)
+    ds.commit()
 
 
 @app.get('/api/groups/{g_id}', tags=["Group"], response_model=schemas.SchemaGroup)
