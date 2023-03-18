@@ -3,7 +3,7 @@ const JSON_HEADERS = {
     'Content-Type': 'application/json'
 };
 
-const NO_GROUP = {"g_id": -1, "g_name": null}
+const NO_GROUP = {"g_id": -1, "g_name": null, "g_tasks_count": -1}
 
 const NO_TASK = {"t_id": -1, "t_date": null, "t_subject": null, "t_priority": -1, "t_comments": null}
 
@@ -19,9 +19,14 @@ new Vue({
     },
     methods: {
         renderGroups() {
-            fetch("groups")
+            fetch("/groups")
                 .then(async (resp) => {
-                    this.$data.groups = await resp.json()
+                    if (resp.status === 200) {
+                        this.$data.groups = await resp.json()
+                    } else {
+                        let j = await resp.text()
+                        alert(resp.status + "\n" + j);
+                    }
                 })
                 .catch((reason) => {
                     console.log(reason)
@@ -34,31 +39,46 @@ new Vue({
             hideTaskDetails();
         },
         renderCurrentGroup(g_id) {
-            fetch("groups/" + g_id)
+            fetch("/groups/" + g_id)
                 .then(async (resp) => {
-                    this.$data.current_group = await resp.json()
+                    if (resp.status === 200) {
+                        this.$data.current_group = await resp.json()
+                    } else {
+                        let j = await resp.text()
+                        alert(resp.status + "\n" + j);
+                    }
                 })
                 .catch((reason) => {
                     console.log(reason)
                 })
         },
         renderGroupTasks(g_id) {
-            fetch("groups/" + g_id + "/tasks")
+            fetch("/groups/" + g_id + "/tasks")
                 .then(async (resp) => {
-                    this.$data.tasks = await resp.json()
+                    if (resp.status === 200) {
+                        this.$data.tasks = await resp.json()
+                    } else {
+                        let j = await resp.text()
+                        alert(resp.status + "\n" + j);
+                    }
                 })
                 .catch((reason) => {
                     console.log(reason)
                 })
         },
         renderTaskDetails(t_id) {
-            fetch("tasks/" + t_id)
+            fetch("/tasks/" + t_id)
                 .then(async (resp) => {
-                    let task = await resp.json()
-                    let subj = document.getElementById("subj");
-                    subj.innerText = task.t_subject;
-                    this.$data.current_task = task;
-                    showTaskDetails();
+                    if (resp.status === 200) {
+                        let task = await resp.json()
+                        let subj = document.getElementById("subj");
+                        subj.innerText = task.t_subject;
+                        this.$data.current_task = task;
+                        showTaskDetails();
+                    } else {
+                        let j = await resp.text()
+                        alert(resp.status + "\n" + j);
+                    }
                 })
                 .catch((reason) => {
                     console.log(reason)
@@ -66,7 +86,7 @@ new Vue({
         },
         groupCreate() {
             let json = formToJson("form_create_group");
-            fetch("groups", {
+            fetch("/groups", {
                 method: 'post',
                 headers: JSON_HEADERS,
                 body: json
@@ -86,7 +106,7 @@ new Vue({
         groupUpdate() {
             let g_id = this.$data.current_group.g_id
             let json = formToJson("form_update_group");
-            fetch("groups/" + g_id, {
+            fetch("/groups/" + g_id, {
                 method: 'put',
                 headers: JSON_HEADERS,
                 body: json
@@ -105,7 +125,7 @@ new Vue({
         },
         groupDelete() {
             let g_id = this.$data.current_group.g_id
-            fetch("groups/" + g_id, {
+            fetch("/groups/" + g_id, {
                 method: 'delete'
             })
                 .then(async (resp) => {
@@ -125,7 +145,7 @@ new Vue({
         taskCreate() {
             let g_id = this.$data.current_group.g_id
             let json = formToJson("form_create_task");
-            fetch("groups/" + g_id + "/tasks", {
+            fetch("/groups/" + g_id + "/tasks", {
                 method: 'post',
                 headers: JSON_HEADERS,
                 body: json
@@ -152,7 +172,7 @@ new Vue({
                     object["t_priority"] = parseInt(object["t_priority"]);
                 }
             });
-            fetch("tasks/" + t_id, {
+            fetch("/tasks/" + t_id, {
                 method: 'put',
                 headers: JSON_HEADERS,
                 body: json
@@ -173,7 +193,7 @@ new Vue({
         taskDelete() {
             let g_id = this.$data.current_group.g_id
             let t_id = this.$data.current_task.t_id
-            fetch("tasks/" + t_id, {
+            fetch("/tasks/" + t_id, {
                 method: "delete"
             })
                 .then(async (resp) => {
