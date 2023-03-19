@@ -10,14 +10,30 @@ const NO_TASK = {"t_id": -1, "t_date": null, "t_subject": null, "t_priority": -1
 new Vue({
     el: "#app",
     data: {
-        curr_g_id: null,
-        curr_t_id: null,
         groups: null,
+        g_name: null,
         current_group: NO_GROUP,
         tasks: null,
+        t_subject: null,
         current_task: NO_TASK,
+        whoiam: "?",
+        task_error: null,
     },
     methods: {
+        askWhoIAm() {
+            fetch("/whoiam")
+                .then(async (resp) => {
+                    if (resp.status === 200) {
+                        this.whoiam = await resp.text()
+                    } else {
+                        let j = await resp.text()
+                        console.log(resp.status + "\n" + j);
+                    }
+                })
+                .catch((reason) => {
+                    console.log(reason)
+                })
+        },
         renderGroups() {
             fetch("/groups")
                 .then(async (resp) => {
@@ -85,7 +101,7 @@ new Vue({
                 })
         },
         groupCreate() {
-            let json = formToJson("form_create_group");
+            let json = JSON.stringify({"g_name": this.$data.g_name})
             fetch("/groups", {
                 method: 'post',
                 headers: JSON_HEADERS,
@@ -144,7 +160,7 @@ new Vue({
         },
         taskCreate() {
             let g_id = this.$data.current_group.g_id
-            let json = formToJson("form_create_task");
+            let json = JSON.stringify({"t_subject": this.$data.t_subject})
             fetch("/groups/" + g_id + "/tasks", {
                 method: 'post',
                 headers: JSON_HEADERS,
@@ -164,14 +180,15 @@ new Vue({
                 })
         },
         taskUpdate() {
+            if (isNaN(this.$data.current_task.t_priority)) {
+                this.$data.current_task.t_priority = parseInt(this.$data.current_task.t_priority);
+            }
+            if (this.$data.current_task.t_priority < 1 || this.$data.current_task.t_priority > 10) {
+                this.$data.task_error = "Priority must be an Integer 1..10";
+            }
+            let json = JSON.stringify(this.$data.current_task)
             let g_id = this.$data.current_group.g_id
             let t_id = this.$data.current_task.t_id
-            let json = formToJson("form_task_details", function (object) {
-                // alert(object)
-                if (!isNaN(object["t_priority"])) {
-                    object["t_priority"] = parseInt(object["t_priority"]);
-                }
-            });
             fetch("/tasks/" + t_id, {
                 method: 'put',
                 headers: JSON_HEADERS,
@@ -183,7 +200,7 @@ new Vue({
                         this.renderTaskDetails(t_id);
                     } else {
                         let text = await resp.text()
-                        alert(resp.status + "\n" + text);
+                        this.$data.task_error = (resp.status + "\n" + text);
                     }
                 })
                 .catch((reason) => {
@@ -216,6 +233,7 @@ new Vue({
     updated() {
     },
     mounted() { // https://codepen.io/g2g/pen/mdyeoXB
+        // this.askWhoIAm();
         this.renderGroups();
     },
 })
@@ -245,16 +263,3 @@ function showGroupDetails() {
     let group_details = document.getElementById("group_details");
     group_details.style.visibility = "visible";
 }
-
-function formToJson(formId, preprocess_cb = null) {
-    // https://stackoverflow.com/questions/29775797/fetch-post-json-data
-    let form = document.forms.namedItem(formId);
-    let formData = new FormData(form);
-    let object = {};
-    formData.forEach((value, key) => object[key] = value);
-    if (preprocess_cb) {
-        preprocess_cb(object);
-    }
-    return JSON.stringify(object);
-}
-
