@@ -197,7 +197,6 @@ new Vue({
             })
                 .then(async (resp) => {
                     if (resp.status === 200) {
-                        this.$data.task_error = null;
                         this.renderGroupTasks(g_id);
                         this.renderTaskDetails(t_id);
                     } else {
