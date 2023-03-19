@@ -90,6 +90,7 @@ new Vue({
                         let subj = document.getElementById("subj");
                         subj.innerText = task.t_subject;
                         this.$data.current_task = task;
+                        this.$data.task_error = null;
                         showTaskDetails();
                     } else {
                         let j = await resp.text()
@@ -196,6 +197,7 @@ new Vue({
             })
                 .then(async (resp) => {
                     if (resp.status === 200) {
+                        this.$data.task_error = null;
                         this.renderGroupTasks(g_id);
                         this.renderTaskDetails(t_id);
                     } else {
