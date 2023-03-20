@@ -122,7 +122,7 @@ new Vue({
         },
         groupUpdate() {
             let g_id = this.$data.current_group.g_id
-            let json = formToJson("form_update_group");
+            let json = JSON.stringify({"g_name": this.$data.g_name})
             fetch("/groups/" + g_id, {
                 method: 'put',
                 headers: JSON_HEADERS,
