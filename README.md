@@ -28,7 +28,7 @@ dto.xml
         """
         __table_args__ = {'extend_existing': True}]]></header>
 
-<field column="t_comments" type="-"/>
+    <field column="t_comments" type="-"/>
 
 </dto-class>
 ```
