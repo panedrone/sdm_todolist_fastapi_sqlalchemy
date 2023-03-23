@@ -17,7 +17,6 @@ class TasksDaoEx(_TasksDao):
         q = self.ds.get_query(TaskLi)
         q = q.filter_by(p_id=p_id)
         q = q.order_by(TaskLi.t_date, TaskLi.t_id)
-        entities = [TaskLi.t_id, TaskLi.t_date, TaskLi.t_subject, TaskLi.t_priority]
-        q = q.with_entities(*entities)  # not before filter_by!!!
+        q = q.with_entities(TaskLi.t_id, TaskLi.t_date, TaskLi.t_subject, TaskLi.t_priority)  # not before filter_by!!!
         tasks = q.all()
         return tasks

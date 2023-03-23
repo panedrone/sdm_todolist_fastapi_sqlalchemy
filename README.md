@@ -9,22 +9,16 @@ dto.xml
 ```xml
 <dto-class name="sa-Project" ref="projects"/>
 
-<dto-class name="sa-ProjectLi" ref="get_projects.sql">
-
-    <header><![CDATA[    """
-        Project list item
-        """]]></header>
-
-</dto-class>
+<dto-class name="sa-ProjectLi" ref="get_projects.sql"/>
 
 <dto-class name="sa-Task" ref="tasks"/>
 
 <dto-class name="sa-TaskLi" ref="tasks">
 
     <header><![CDATA[    """
-        Task list item
-        """
-        __table_args__ = {'extend_existing': True}]]></header>
+    Task list item
+    """
+    __table_args__ = {'extend_existing': True}]]></header>
 
     <field column="t_comments" type="-"/>
 
