@@ -79,7 +79,7 @@ async def project_delete(p_id: int, ds: DataStore = Depends(get_ds)):
 
 @app.get('/projects/{p_id}/tasks', tags=["ProjectTaskLI"], response_model=List[schemas.SchemaProjectTaskLI])
 def project_tasks(p_id: int, ds: DataStore = Depends(get_ds)):
-    return TasksDaoEx(ds).get_tasks_by_project(p_id)
+    return TasksDaoEx(ds).get_project_tasks(p_id)
 
 
 @app.post('/projects/{p_id}/tasks', tags=["ProjectTaskLI"], status_code=201)
@@ -88,9 +88,7 @@ async def task_create(p_id: int, item_request: schemas.SchemaTaskCreate, ds: Dat
     task = Task()
     task.p_id = p_id
     task.t_subject = j['t_subject']
-    now = datetime.now()
-    dt_string = now.strftime("%Y-%m-%d")
-    task.t_date = dt_string
+    task.t_date = datetime.now().strftime("%Y-%m-%d")
     task.t_priority = 1
     task.t_comments = ''
     TasksDaoEx(ds).create_task(task)
