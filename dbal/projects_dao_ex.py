@@ -16,5 +16,5 @@ class ProjectsDaoEx(_ProjectsDao):
     def get_all_projects(self):
         return self.ds.get_all_raw(ProjectLi)
 
-    def rename(self, p_id, p_name):
+    def rename_project(self, p_id, p_name):
         self.ds.update_by_filter(Project, data={'p_name': p_name}, params={'p_id': p_id})

@@ -55,9 +55,8 @@ def get_all_projects(ds: DataStore = Depends(get_ds)):
 
 @app.post('/projects', tags=["ProjectList"], status_code=201)
 async def project_create(item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
-    p_dao = ProjectsDaoEx(ds)
     project = Project(p_name=item_request.p_name)
-    p_dao.create_project(project)
+    ProjectsDaoEx(ds).create_project(project)
     ds.commit()
 
 
@@ -68,7 +67,7 @@ def project_read(p_id: int, ds: DataStore = Depends(get_ds)):
 
 @app.put('/projects/{p_id}', tags=["Project"])
 async def project_update(p_id: int, item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
-    ProjectsDaoEx(ds).rename(p_id, item_request.p_name)
+    ProjectsDaoEx(ds).rename_project(p_id, item_request.p_name)
     ds.commit()
 
 
