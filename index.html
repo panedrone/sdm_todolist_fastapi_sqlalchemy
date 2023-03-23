@@ -138,7 +138,28 @@
             </td>
             <td>
                 <form id="form_task_details" style="visibility: hidden">
-                    <div class="title" id="subj"></div>
+                    <table class="controls">
+                        <tr>
+                            <td>
+                                <div class="title">
+                                    {{ current_subject }}
+                                </div>
+                            </td>
+                            <td class="w1">
+                                <a href="#" @click="taskUpdate()">
+                                    <input type="button" value="&#x2713;"/>
+                                </a>
+                            </td>
+                            <td class="w1">
+                                <a href="#" @click="taskDelete()">
+                                    <input type="button" value="x"/>
+                                </a>
+                            </td>
+                            <td class="w1">
+                                <a href="javascript:hideTaskDetails();"><input type="button" value="&lt;"/> </a>
+                            </td>
+                        </tr>
+                    </table>
                     <table>
                         <tr>
                             <td class="form-label">Date</td>
@@ -172,28 +193,9 @@
                             </td>
                         </tr>
                     </table>
-                    <table class="controls">
-                        <tr>
-                            <td>
-                                <div style="color: crimson;max-width: 200px;">
-                                    {{ task_error }}
-                                </div>
-                            </td>
-                            <td class="w1">
-                                <a href="#" @click="taskUpdate()">
-                                    <input type="button" value="&#x2713;"/>
-                                </a>
-                            </td>
-                            <td class="w1">
-                                <a href="#" @click="taskDelete()">
-                                    <input type="button" value="x"/>
-                                </a>
-                            </td>
-                            <td class="w1">
-                                <a href="javascript:hideTaskDetails();"><input type="button" value="&lt;"/> </a>
-                            </td>
-                        </tr>
-                    </table>
+                    <div style="color: crimson;max-width: 310px;">
+                        {{ task_error }}
+                    </div>
                 </form>
             </td>
         </tr>
