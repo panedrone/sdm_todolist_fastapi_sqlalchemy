@@ -8,7 +8,7 @@ from dbal._tasks_dao import _TasksDao
 from dbal.task_li import TaskLi
 
 
-class TasksDaoEx(_TasksDao):
+class TasksDao(_TasksDao):
 
     def __init__(self, ds):
         super().__init__(ds)

@@ -36,29 +36,29 @@ Generated code in action:
 ```go
 @app.get('/projects', tags=["ProjectList"], response_model=List[schemas.SchemaProjectLi])
 def get_all_projects(ds: DataStore = Depends(get_ds)):
-    return ProjectsDaoEx(ds).get_all_projects()
+    return ProjectsDao(ds).get_all_projects()
 
 
 @app.post('/projects', tags=["ProjectList"], status_code=201)
 async def project_create(item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
     project = Project(p_name=item_request.p_name)
-    ProjectsDaoEx(ds).create_project(project)
+    ProjectsDao(ds).create_project(project)
     ds.commit()
 
 
 @app.get('/projects/{p_id}', tags=["Project"], response_model=schemas.SchemaProject)
 def project_read(p_id: int, ds: DataStore = Depends(get_ds)):
-    return ProjectsDaoEx(ds).read_project(p_id)
+    return ProjectsDao(ds).read_project(p_id)
 
 
 @app.put('/projects/{p_id}', tags=["Project"])
 async def project_update(p_id: int, item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
-    ProjectsDaoEx(ds).rename_project(p_id, item_request.p_name)
+    ProjectsDao(ds).rename_project(p_id, item_request.p_name)
     ds.commit()
 
 
 @app.delete('/projects/{p_id}', tags=["Project"], status_code=204)
 async def project_delete(p_id: int, ds: DataStore = Depends(get_ds)):
-    ProjectsDaoEx(ds).delete_project(p_id)
+    ProjectsDao(ds).delete_project(p_id)
     ds.commit()
 ```

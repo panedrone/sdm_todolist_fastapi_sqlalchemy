@@ -13,9 +13,9 @@ import schemas
 from db import get_ds
 from dbal.data_store import DataStore
 from dbal.project import Project
-from dbal.projects_dao_ex import ProjectsDaoEx
+from dbal.projects_dao_ex import ProjectsDao
 from dbal.task import Task
-from dbal.tasks_dao_ex import TasksDaoEx
+from dbal.tasks_dao_ex import TasksDao
 
 app = FastAPI(title="SDM + FastAPI Application",
               description="SDM + FastAPI Application with Sqlalchemy",
@@ -50,36 +50,36 @@ async def add_process_time_header(request, call_next):
 
 @app.get('/projects', tags=["ProjectList"], response_model=List[schemas.SchemaProjectLi])
 def get_all_projects(ds: DataStore = Depends(get_ds)):
-    return ProjectsDaoEx(ds).get_all_projects()
+    return ProjectsDao(ds).get_all_projects()
 
 
 @app.post('/projects', tags=["ProjectList"], status_code=201)
 async def project_create(item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
     project = Project(p_name=item_request.p_name)
-    ProjectsDaoEx(ds).create_project(project)
+    ProjectsDao(ds).create_project(project)
     ds.commit()
 
 
 @app.get('/projects/{p_id}', tags=["Project"], response_model=schemas.SchemaProject)
 def project_read(p_id: int, ds: DataStore = Depends(get_ds)):
-    return ProjectsDaoEx(ds).read_project(p_id)
+    return ProjectsDao(ds).read_project(p_id)
 
 
 @app.put('/projects/{p_id}', tags=["Project"])
 async def project_update(p_id: int, item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
-    ProjectsDaoEx(ds).rename_project(p_id, item_request.p_name)
+    ProjectsDao(ds).rename_project(p_id, item_request.p_name)
     ds.commit()
 
 
 @app.delete('/projects/{p_id}', tags=["Project"], status_code=204)
 async def project_delete(p_id: int, ds: DataStore = Depends(get_ds)):
-    ProjectsDaoEx(ds).delete_project(p_id)
+    ProjectsDao(ds).delete_project(p_id)
     ds.commit()
 
 
 @app.get('/projects/{p_id}/tasks', tags=["ProjectTaskLI"], response_model=List[schemas.SchemaProjectTaskLI])
 def project_tasks(p_id: int, ds: DataStore = Depends(get_ds)):
-    return TasksDaoEx(ds).get_project_tasks(p_id)
+    return TasksDao(ds).get_project_tasks(p_id)
 
 
 @app.post('/projects/{p_id}/tasks', tags=["ProjectTaskLI"], status_code=201)
@@ -91,25 +91,25 @@ async def task_create(p_id: int, item_request: schemas.SchemaTaskCreate, ds: Dat
     task.t_date = datetime.now().strftime("%Y-%m-%d")
     task.t_priority = 1
     task.t_comments = ''
-    TasksDaoEx(ds).create_task(task)
+    TasksDao(ds).create_task(task)
     ds.commit()
 
 
 @app.get('/tasks/{t_id}', tags=["Task"], response_model=schemas.SchemaTaskEdit)
 def task_read(t_id: int, ds: DataStore = Depends(get_ds)):
-    return TasksDaoEx(ds).read_task(t_id)
+    return TasksDao(ds).read_task(t_id)
 
 
 @app.put('/tasks/{t_id}', tags=["Task"])
 async def task_update(t_id: int, item_request: schemas.SchemaTaskEdit, ds: DataStore = Depends(get_ds)):
     j = jsonable_encoder(item_request)
-    TasksDaoEx(ds).update_task(t_id, j)
+    TasksDao(ds).update_task(t_id, j)
     ds.commit()
 
 
 @app.delete('/tasks/{t_id}', tags=["Task"], status_code=204)
 async def task_delete(t_id: int, ds: DataStore = Depends(get_ds)):
-    TasksDaoEx(ds).delete_task(t_id)
+    TasksDao(ds).delete_task(t_id)
     ds.commit()
 
 

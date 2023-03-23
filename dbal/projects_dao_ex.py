@@ -8,7 +8,7 @@ from dbal.project import Project
 from dbal.project_li import ProjectLi
 
 
-class ProjectsDaoEx(_ProjectsDao):
+class ProjectsDao(_ProjectsDao):
 
     def __init__(self, ds):
         super().__init__(ds)
