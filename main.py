@@ -48,12 +48,12 @@ async def add_process_time_header(request, call_next):
     return response
 
 
-@app.get('/projects', tags=["GroupList"], response_model=List[schemas.SchemaProjectLi])
+@app.get('/projects', tags=["ProjectList"], response_model=List[schemas.SchemaProjectLi])
 def get_all_projects(ds: DataStore = Depends(get_ds)):
     return ProjectsDaoEx(ds).get_all_projects()
 
 
-@app.post('/projects', tags=["GroupList"], status_code=201)
+@app.post('/projects', tags=["ProjectList"], status_code=201)
 async def project_create(item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
     p_dao = ProjectsDaoEx(ds)
     project = Project(p_name=item_request.p_name)
@@ -61,29 +61,29 @@ async def project_create(item_request: schemas.SchemaProjectCreateUpdate, ds: Da
     ds.commit()
 
 
-@app.get('/projects/{p_id}', tags=["Group"], response_model=schemas.SchemaProject)
+@app.get('/projects/{p_id}', tags=["Project"], response_model=schemas.SchemaProject)
 def project_read(p_id: int, ds: DataStore = Depends(get_ds)):
     return ProjectsDaoEx(ds).read_project(p_id)
 
 
-@app.put('/projects/{p_id}', tags=["Group"])
+@app.put('/projects/{p_id}', tags=["Project"])
 async def project_update(p_id: int, item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
     ProjectsDaoEx(ds).rename(p_id, item_request.p_name)
     ds.commit()
 
 
-@app.delete('/projects/{p_id}', tags=["Group"], status_code=204)
+@app.delete('/projects/{p_id}', tags=["Project"], status_code=204)
 async def project_delete(p_id: int, ds: DataStore = Depends(get_ds)):
     ProjectsDaoEx(ds).delete_project(p_id)
     ds.commit()
 
 
-@app.get('/projects/{p_id}/tasks', tags=["GroupTaskLI"], response_model=List[schemas.SchemaGroupTaskLI])
+@app.get('/projects/{p_id}/tasks', tags=["ProjectTaskLI"], response_model=List[schemas.SchemaProjectTaskLI])
 def project_tasks(p_id: int, ds: DataStore = Depends(get_ds)):
     return TasksDaoEx(ds).get_tasks_by_project(p_id)
 
 
-@app.post('/projects/{p_id}/tasks', tags=["GroupTaskLI"], status_code=201)
+@app.post('/projects/{p_id}/tasks', tags=["ProjectTaskLI"], status_code=201)
 async def task_create(p_id: int, item_request: schemas.SchemaTaskCreate, ds: DataStore = Depends(get_ds)):
     j = jsonable_encoder(item_request)
     task = Task()
