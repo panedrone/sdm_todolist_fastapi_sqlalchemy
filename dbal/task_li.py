@@ -6,7 +6,7 @@ https://sqldalmaker.sourceforge.net/
 from .data_store import *
 
 
-class TaskLI(Base):
+class TaskLi(Base):
     """
     Task list item
     """
