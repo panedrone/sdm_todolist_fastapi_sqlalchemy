@@ -17,7 +17,7 @@ class SchemaProjectCreateUpdate(_SchemaProjectBase):
         # https://github.com/pydantic/pydantic/issues/1223
         # https://levelup.gitconnected.com/how-to-validate-your-data-with-custom-validators-of-pydantic-models-743561a4ab53
         if not v:
-            raise ValueError('Group name may not be empty')
+            raise ValueError('Project name may not be empty')
         return v
 
 
@@ -48,7 +48,7 @@ class _SchemaTaskBase(BaseModel):
         orm_mode = True
 
 
-class SchemaGroupTaskLI(_SchemaTaskBase):
+class SchemaProjectTaskLI(_SchemaTaskBase):
     t_id: int
     t_priority: int
     t_date: str
