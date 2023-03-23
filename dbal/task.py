@@ -10,7 +10,7 @@ class Task(Base):
     __tablename__ = 'tasks'
 
     t_id = Column('t_id', Integer, primary_key=True, autoincrement=True)
-    g_id = Column('g_id', Integer, ForeignKey('groups.g_id'))
+    p_id = Column('p_id', Integer, ForeignKey('projects.p_id'), nullable=True)
     t_priority = Column('t_priority', Integer)
     t_date = Column('t_date', String(65535))
     t_subject = Column('t_subject', String(65535))

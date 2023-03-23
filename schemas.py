@@ -3,17 +3,17 @@ from datetime import datetime
 from pydantic import BaseModel, validator
 
 
-class _SchemaGroupBase(BaseModel):
+class _SchemaProjectBase(BaseModel):
     class Config:
         orm_mode = True
 
 
-class SchemaGroupCreateUpdate(_SchemaGroupBase):
-    g_name: str
+class SchemaProjectCreateUpdate(_SchemaProjectBase):
+    p_name: str
 
     # @classmethod  # -------- don't use with @validator!!!
-    @validator('g_name')
-    def validate_g_name(cls, v):
+    @validator('p_name')
+    def validate_p_name(cls, v):
         # https://github.com/pydantic/pydantic/issues/1223
         # https://levelup.gitconnected.com/how-to-validate-your-data-with-custom-validators-of-pydantic-models-743561a4ab53
         if not v:
@@ -21,15 +21,15 @@ class SchemaGroupCreateUpdate(_SchemaGroupBase):
         return v
 
 
-class SchemaGroup(_SchemaGroupBase):
-    g_id: int
-    g_name: str
+class SchemaProject(_SchemaProjectBase):
+    p_id: int
+    p_name: str
 
 
-class SchemaGroupLi(_SchemaGroupBase):
-    g_id: int
-    g_name: str
-    g_tasks_count: int
+class SchemaProjectLi(_SchemaProjectBase):
+    p_id: int
+    p_name: str
+    p_tasks_count: int
 
 
 # .................................

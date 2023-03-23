@@ -2,15 +2,9 @@
 <dto-classes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="dto.xsd">
 
-    <dto-class name="sa-Group" ref="groups"/>
+    <dto-class name="sa-Project" ref="projects"/>
 
-    <dto-class name="sa-GroupLi" ref="get_groups.sql">
-
-        <header><![CDATA[    """
-    Group list item
-    """]]></header>
-
-    </dto-class>
+    <dto-class name="sa-ProjectLi" ref="get_projects.sql"/>
 
     <dto-class name="sa-Task" ref="tasks"/>
 

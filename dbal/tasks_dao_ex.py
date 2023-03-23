@@ -14,9 +14,9 @@ class TasksDaoEx(_TasksDao):
     def __init__(self, ds):
         super().__init__(ds)
 
-    def get_tasks_by_group(self, g_id):
+    def get_tasks_by_project(self, p_id):
         q = self.ds.get_query(TaskLI)
-        q = q.filter_by(g_id=g_id)
+        q = q.filter_by(p_id=p_id)
         q = q.order_by(TaskLI.t_date, TaskLI.t_id)
         fields = ['t_id', 't_date', 't_subject', 't_priority']
         entities = [column(f) for f in fields]

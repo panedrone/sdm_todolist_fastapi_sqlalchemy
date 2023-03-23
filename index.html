@@ -18,19 +18,19 @@
                 <table>
                     <tr>
                         <td>
-                            <table id="groups_table" class="section">
+                            <table class="section">
                                 <tr>
-                                    <th>Group</th>
+                                    <th>Project</th>
                                     <th>Tasks Count</th>
                                 </tr>
-                                <tr v-for="group in $data.groups">
+                                <tr v-for="project in $data.projects">
                                     <td>
-                                        <a href="#" @click="renderGroupDetails(group.g_id)">
-                                            {{ group.g_name }}
+                                        <a href="#" @click="renderGroupDetails(project.p_id)">
+                                            {{ project.p_name }}
                                         </a>
                                     </td>
                                     <td style="text-align: center;width: 80px;">
-                                        {{ group.g_tasks_count }}
+                                        {{ project.p_tasks_count }}
                                     </td>
                                 </tr>
                             </table>
@@ -38,12 +38,12 @@
                     </tr>
                     <tr>
                         <td>
-                            <form method="post" enctype="multipart/form-data" name="form_create_group">
+                            <form method="post" enctype="multipart/form-data">
                                 <table class="controls">
                                     <tr>
                                         <td>
                                             <label>
-                                                <input type="text" v-model="g_name"/>
+                                                <input type="text" v-model="p_name"/>
                                             </label>
                                         </td>
                                         <td class="w1">
@@ -62,12 +62,13 @@
                 <table id="group_details" style="visibility: hidden">
                     <tr>
                         <td>
-                            <form method="post" id="form_update_group">
+                            <form method="post">
                                 <table class="controls">
                                     <tr>
                                         <td>
                                             <label>
-                                                <input class="group-header" type="text" v-model="current_group.g_name"/>
+                                                <input type="text" class="group-header"
+                                                       v-model="current_project.p_name"/>
                                             </label>
                                         </td>
                                         <td class="w1">
@@ -81,8 +82,9 @@
                                             </a>
                                         </td>
                                         <td class="w1">
-                                            <a href="javascript:hideGroupDetails2();"><input type="button"
-                                                                                             value="&lt;"/></a>
+                                            <a href="javascript:hideGroupDetails2();">
+                                                <input type="button" value="&lt;"/>
+                                            </a>
                                         </td>
                                     </tr>
                                 </table>
@@ -91,7 +93,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <table id="tasks_table" class="section">
+                            <table class="section">
                                 <tr>
                                     <th>Date</th>
                                     <th>Subject</th>
@@ -116,7 +118,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <form method="post" id="form_create_task">
+                            <form method="post">
                                 <table class="controls">
                                     <tr>
                                         <td>
@@ -140,8 +142,8 @@
                 <form id="form_task_details" style="visibility: hidden">
                     <table class="controls">
                         <tr>
-                            <td>
-                                <div class="title">
+                            <td  class="w100">
+                                <div class="title" id="subj">
                                     {{ current_subject }}
                                 </div>
                             </td>

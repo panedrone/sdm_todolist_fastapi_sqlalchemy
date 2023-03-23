@@ -2,7 +2,7 @@
 <dao-class xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="dao.xsd">
 
-    <crud dto="sa-Group" table="groups">
+    <crud dto="sa-Project" table="projects">
         <create/>
 <!--        <read-all/>-->
         <read/>

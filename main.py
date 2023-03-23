@@ -12,8 +12,8 @@ from starlette.staticfiles import StaticFiles
 import schemas
 from db import get_ds
 from dbal.data_store import DataStore
-from dbal.group import Group
-from dbal.groups_dao_ex import GroupsDaoEx
+from dbal.project import Project
+from dbal.projects_dao_ex import ProjectsDaoEx
 from dbal.task import Task
 from dbal.tasks_dao_ex import TasksDaoEx
 
@@ -48,46 +48,46 @@ async def add_process_time_header(request, call_next):
     return response
 
 
-@app.get('/groups', tags=["GroupList"], response_model=List[schemas.SchemaGroupLi])
-def get_all_groups(ds: DataStore = Depends(get_ds)):
-    return GroupsDaoEx(ds).get_all_groups()
+@app.get('/projects', tags=["GroupList"], response_model=List[schemas.SchemaProjectLi])
+def get_all_projects(ds: DataStore = Depends(get_ds)):
+    return ProjectsDaoEx(ds).get_all_projects()
 
 
-@app.post('/groups', tags=["GroupList"], status_code=201)
-async def group_create(item_request: schemas.SchemaGroupCreateUpdate, ds: DataStore = Depends(get_ds)):
-    g_dao = GroupsDaoEx(ds)
-    group = Group(g_name=item_request.g_name)
-    g_dao.create_group(group)
+@app.post('/projects', tags=["GroupList"], status_code=201)
+async def project_create(item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
+    p_dao = ProjectsDaoEx(ds)
+    project = Project(p_name=item_request.p_name)
+    p_dao.create_project(project)
     ds.commit()
 
 
-@app.get('/groups/{g_id}', tags=["Group"], response_model=schemas.SchemaGroup)
-def group_read(g_id: int, ds: DataStore = Depends(get_ds)):
-    return GroupsDaoEx(ds).read_group(g_id)
+@app.get('/projects/{p_id}', tags=["Group"], response_model=schemas.SchemaProject)
+def project_read(p_id: int, ds: DataStore = Depends(get_ds)):
+    return ProjectsDaoEx(ds).read_project(p_id)
 
 
-@app.put('/groups/{g_id}', tags=["Group"])
-async def group_update(g_id: int, item_request: schemas.SchemaGroupCreateUpdate, ds: DataStore = Depends(get_ds)):
-    GroupsDaoEx(ds).rename(g_id, item_request.g_name)
+@app.put('/projects/{p_id}', tags=["Group"])
+async def project_update(p_id: int, item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
+    ProjectsDaoEx(ds).rename(p_id, item_request.p_name)
     ds.commit()
 
 
-@app.delete('/groups/{g_id}', tags=["Group"], status_code=204)
-async def group_delete(g_id: int, ds: DataStore = Depends(get_ds)):
-    GroupsDaoEx(ds).delete_group(g_id)
+@app.delete('/projects/{p_id}', tags=["Group"], status_code=204)
+async def project_delete(p_id: int, ds: DataStore = Depends(get_ds)):
+    ProjectsDaoEx(ds).delete_project(p_id)
     ds.commit()
 
 
-@app.get('/groups/{g_id}/tasks', tags=["GroupTaskLI"], response_model=List[schemas.SchemaGroupTaskLI])
-def group_tasks(g_id: int, ds: DataStore = Depends(get_ds)):
-    return TasksDaoEx(ds).get_tasks_by_group(g_id)
+@app.get('/projects/{p_id}/tasks', tags=["GroupTaskLI"], response_model=List[schemas.SchemaGroupTaskLI])
+def project_tasks(p_id: int, ds: DataStore = Depends(get_ds)):
+    return TasksDaoEx(ds).get_tasks_by_project(p_id)
 
 
-@app.post('/groups/{g_id}/tasks', tags=["GroupTaskLI"], status_code=201)
-async def task_create(g_id: int, item_request: schemas.SchemaTaskCreate, ds: DataStore = Depends(get_ds)):
+@app.post('/projects/{p_id}/tasks', tags=["GroupTaskLI"], status_code=201)
+async def task_create(p_id: int, item_request: schemas.SchemaTaskCreate, ds: DataStore = Depends(get_ds)):
     j = jsonable_encoder(item_request)
     task = Task()
-    task.g_id = g_id
+    task.p_id = p_id
     task.t_subject = j['t_subject']
     now = datetime.now()
     dt_string = now.strftime("%Y-%m-%d")
