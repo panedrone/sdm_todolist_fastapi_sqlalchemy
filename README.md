@@ -9,12 +9,12 @@ Front-end is written in Vue.js, SQLite3 is used as database.
 
 dto.xml
 ```xml
-<dto-class name="sa-Group" ref="groups"/>
+<dto-class name="sa-Project" ref="projects"/>
 
-<dto-class name="sa-GroupLi" ref="get_groups.sql">
+<dto-class name="sa-ProjectLi" ref="get_projects.sql">
 
     <header><![CDATA[    """
-        Group list item
+        Project list item
         """]]></header>
 
 </dto-class>
@@ -32,9 +32,9 @@ dto.xml
 
 </dto-class>
 ```
-GroupsDao.xml
+ProjectsDao.xml
 ```xml
-<crud dto="sa-Group" table="groups"/>
+<crud dto="sa-Project" table="projects"/>
 ```
 TasksDao.xml
 ```xml
@@ -42,32 +42,32 @@ TasksDao.xml
 ```
 Generated code in action:
 ```go
-@app.get('/groups', tags=["GroupList"], response_model=List[schemas.SchemaProjectLi])
-def get_all_groups(ds: DataStore = Depends(get_ds)):
-    return GroupsDaoEx(ds).get_all_groups()
+@app.get('/projects', tags=["ProjectList"], response_model=List[schemas.SchemaProjectLi])
+def get_all_projects(ds: DataStore = Depends(get_ds)):
+    return ProjectsDaoEx(ds).get_all_projects()
 
 
-@app.post('/groups', tags=["GroupList"], status_code=201)
-async def group_create(item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
-    g_dao = GroupsDaoEx(ds)
-    group = Group(g_name=item_request.g_name)
-    g_dao.create_group(group)
+@app.post('/projects', tags=["ProjectList"], status_code=201)
+async def project_create(item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
+    p_dao = ProjectsDaoEx(ds)
+    project = Project(p_name=item_request.p_name)
+    p_dao.create_project(project)
     ds.commit()
 
 
-@app.get('/groups/{g_id}', tags=["Group"], response_model=schemas.SchemaProject)
-def group_read(g_id: int, ds: DataStore = Depends(get_ds)):
-    return GroupsDaoEx(ds).read_group(g_id)
+@app.get('/projects/{p_id}', tags=["Project"], response_model=schemas.SchemaProject)
+def project_read(p_id: int, ds: DataStore = Depends(get_ds)):
+    return ProjectsDaoEx(ds).read_project(p_id)
 
 
-@app.put('/groups/{g_id}', tags=["Group"])
-async def group_update(g_id: int, item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
-    GroupsDaoEx(ds).rename(g_id, item_request.g_name)
+@app.put('/projects/{p_id}', tags=["Project"])
+async def project_update(p_id: int, item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
+    ProjectsDaoEx(ds).rename(p_id, item_request.p_name)
     ds.commit()
 
 
-@app.delete('/groups/{g_id}', tags=["Group"], status_code=204)
-async def group_delete(g_id: int, ds: DataStore = Depends(get_ds)):
-    GroupsDaoEx(ds).delete_group(g_id)
+@app.delete('/projects/{p_id}', tags=["Project"], status_code=204)
+async def project_delete(p_id: int, ds: DataStore = Depends(get_ds)):
+    ProjectsDaoEx(ds).delete_project(p_id)
     ds.commit()
 ```
