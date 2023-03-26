@@ -34,25 +34,25 @@ TasksDao.xml
 ```
 Generated code in action:
 ```go
-@app.get('/projects', tags=["ProjectList"], response_model=List[schemas.SchemaProjectLi])
+@app.get('/projects', tags=["ProjectList"], response_model=List[SchemaProjectLi])
 def get_all_projects(ds: DataStore = Depends(get_ds)):
     return ProjectsDao(ds).get_all_projects()
 
 
 @app.post('/projects', tags=["ProjectList"], status_code=201)
-async def project_create(item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
+async def project_create(item_request: SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
     project = Project(p_name=item_request.p_name)
     ProjectsDao(ds).create_project(project)
     ds.commit()
 
 
-@app.get('/projects/{p_id}', tags=["Project"], response_model=schemas.SchemaProject)
+@app.get('/projects/{p_id}', tags=["Project"], response_model=SchemaProject)
 def project_read(p_id: int, ds: DataStore = Depends(get_ds)):
     return ProjectsDao(ds).read_project(p_id)
 
 
 @app.put('/projects/{p_id}', tags=["Project"])
-async def project_update(p_id: int, item_request: schemas.SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
+async def project_update(p_id: int, item_request: SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
     ProjectsDao(ds).rename_project(p_id, item_request.p_name)
     ds.commit()
 
