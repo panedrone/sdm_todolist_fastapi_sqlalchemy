@@ -26,11 +26,11 @@ dto.xml
 ```
 ProjectsDao.xml
 ```xml
-<crud dto="sa-Project" table="projects"/>
+<crud dto="sa-Project"/>
 ```
 TasksDao.xml
 ```xml
-<crud dto="sa-Task" table="tasks"/>
+<crud dto="sa-Task"/>
 ```
 Generated code in action:
 ```go
