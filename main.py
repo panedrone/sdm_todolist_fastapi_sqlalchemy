@@ -8,16 +8,16 @@ from fastapi.responses import JSONResponse
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
-from schemas import *
 from db import get_ds
 from dbal.data_store import DataStore
 from dbal.project import Project
 from dbal.projects_dao_ex import ProjectsDao
 from dbal.task import Task
 from dbal.tasks_dao_ex import TasksDao
+from schemas import *
 
-app = FastAPI(title="SDM + FastAPI Application",
-              description="SDM + FastAPI Application with Sqlalchemy",
+app = FastAPI(title="SDM + FastAPI + SQLAlchemy",
+              description="Quick Demo of how to use SQL DAL Maker + Python + FastAPI + SQLAlchemy",
               version="1.0.0", )
 
 # https://stackoverflow.com/questions/65916537/a-minimal-fastapi-example-loading-index-html
@@ -47,41 +47,41 @@ async def add_process_time_header(request, call_next):
     return response
 
 
-@app.get('/projects', tags=["ProjectList"], response_model=List[SchemaProjectLi])
+@app.get('/api/projects', tags=["ProjectList"], response_model=List[SchemaProjectLi])
 def get_all_projects(ds: DataStore = Depends(get_ds)):
     return ProjectsDao(ds).get_all_projects()
 
 
-@app.post('/projects', tags=["ProjectList"], status_code=201)
+@app.post('/api/projects', tags=["ProjectList"], status_code=201)
 async def project_create(item_request: SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
     project = Project(p_name=item_request.p_name)
     ProjectsDao(ds).create_project(project)
     ds.commit()
 
 
-@app.get('/projects/{p_id}', tags=["Project"], response_model=SchemaProject)
+@app.get('/api/projects/{p_id}', tags=["Project"], response_model=SchemaProject)
 def project_read(p_id: int, ds: DataStore = Depends(get_ds)):
     return ProjectsDao(ds).read_project(p_id)
 
 
-@app.put('/projects/{p_id}', tags=["Project"])
+@app.put('/api/projects/{p_id}', tags=["Project"])
 async def project_update(p_id: int, item_request: SchemaProjectCreateUpdate, ds: DataStore = Depends(get_ds)):
     ProjectsDao(ds).rename_project(p_id, item_request.p_name)
     ds.commit()
 
 
-@app.delete('/projects/{p_id}', tags=["Project"], status_code=204)
+@app.delete('/api/projects/{p_id}', tags=["Project"], status_code=204)
 async def project_delete(p_id: int, ds: DataStore = Depends(get_ds)):
     ProjectsDao(ds).delete_project(p_id)
     ds.commit()
 
 
-@app.get('/projects/{p_id}/tasks', tags=["ProjectTaskLI"], response_model=List[SchemaProjectTaskLI])
+@app.get('/api/projects/{p_id}/tasks', tags=["ProjectTaskLI"], response_model=List[SchemaProjectTaskLI])
 def project_tasks(p_id: int, ds: DataStore = Depends(get_ds)):
     return TasksDao(ds).get_project_tasks(p_id)
 
 
-@app.post('/projects/{p_id}/tasks', tags=["ProjectTaskLI"], status_code=201)
+@app.post('/api/projects/{p_id}/tasks', tags=["ProjectTaskLI"], status_code=201)
 async def task_create(p_id: int, item_request: SchemaTaskCreate, ds: DataStore = Depends(get_ds)):
     j = jsonable_encoder(item_request)
     task = Task()
@@ -94,19 +94,19 @@ async def task_create(p_id: int, item_request: SchemaTaskCreate, ds: DataStore =
     ds.commit()
 
 
-@app.get('/tasks/{t_id}', tags=["Task"], response_model=SchemaTaskEdit)
+@app.get('/api/tasks/{t_id}', tags=["Task"], response_model=SchemaTaskEdit)
 def task_read(t_id: int, ds: DataStore = Depends(get_ds)):
     return TasksDao(ds).read_task(t_id)
 
 
-@app.put('/tasks/{t_id}', tags=["Task"])
+@app.put('/api/tasks/{t_id}', tags=["Task"])
 async def task_update(t_id: int, item_request: SchemaTaskEdit, ds: DataStore = Depends(get_ds)):
     j = jsonable_encoder(item_request)
     TasksDao(ds).update_task(t_id, j)
     ds.commit()
 
 
-@app.delete('/tasks/{t_id}', tags=["Task"], status_code=204)
+@app.delete('/api/tasks/{t_id}', tags=["Task"], status_code=204)
 async def task_delete(t_id: int, ds: DataStore = Depends(get_ds)):
     TasksDao(ds).delete_task(t_id)
     ds.commit()
