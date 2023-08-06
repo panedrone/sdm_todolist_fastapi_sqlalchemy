@@ -20,8 +20,8 @@ def get_ds() -> DataStore:
     # seems like it is from here:
     #   C:\Program Files\Python39\Lib\contextlib.py
     #       --> def contextmanager(func):
-    db = SessionLocal()
+    session = SessionLocal()
     try:
-        yield create_ds(db)
+        yield create_ds(session)
     finally:
-        db.close()
+        session.close()

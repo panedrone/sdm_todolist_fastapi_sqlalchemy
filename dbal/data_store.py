@@ -16,8 +16,9 @@
 """
 
 import sqlalchemy.orm
-
 from sqlalchemy import text
+
+# from sqlalchemy.dialects import oracle
 
 
 class OutParam:
@@ -69,7 +70,6 @@ class DataStore:
 
     def delete_by_filter(self, cls, params: dict) -> int:
         """
-        delete_by_filter
         :param cls: a model class
         :param params: dict of named filter params
         :return: amount of rows affected
@@ -78,7 +78,6 @@ class DataStore:
 
     def update_by_filter(self, cls, data: dict, params: dict) -> int:
         """
-        update_by_filter
         :param cls: a model class
         :param data: dict of column-value to update
         :param params: dict of filter params
@@ -90,7 +89,6 @@ class DataStore:
 
     def create_one(self, entity) -> None:
         """
-        create_one
         :param entity: a model object or serializer object
         :return: None
         """
@@ -113,7 +111,6 @@ class DataStore:
 
     def update_one(self, cls, data: dict, pk: dict) -> int:
         """
-        update_one
         :param cls: model class
         :param data: dict of column-value to update
         :param pk: primary key as a dict of column-value pairs
@@ -181,6 +178,33 @@ Base = sqlalchemy.orm.declarative_base()
 Column = sqlalchemy.Column
 ForeignKey = sqlalchemy.ForeignKey
 
+# if oracle:
+#
+#     SmallInteger = oracle.NUMBER
+#     Integer = oracle.NUMBER
+#     BigInteger = oracle.NUMBER
+#
+#     Numeric = oracle.NUMBER
+#     Float = oracle.NUMBER
+#
+#     # unlike default "Float", INSERT works correctly with IDENTITY columns like
+#     # g_id = Column('G_ID', NUMBER, primary_key=True, autoincrement=True)
+#     NUMBER = oracle.NUMBER
+#
+#     # https://stackoverflow.com/questions/64903159/convert-oracle-datatypes-to-sqlalchemy-types
+#     # https://docs.sqlalchemy.org/en/14/dialects/oracle.html
+#     # Provide the oracle DATE type.
+#     #     This type has no special Python behavior, except that it subclasses
+#     #     :class:`_types.DateTime`; this is to suit the fact that the Oracle
+#     #     ``DATE`` type supports a time value.
+#     DateTime = oracle.DATE  # (timezone=False)
+#
+#     String = oracle.NVARCHAR
+#     Boolean = oracle.LONG
+#     LargeBinary = oracle.BLOB
+#
+# else:
+
 SmallInteger = sqlalchemy.SmallInteger
 Integer = sqlalchemy.Integer
 BigInteger = sqlalchemy.BigInteger
@@ -194,8 +218,111 @@ Boolean = sqlalchemy.Boolean
 LargeBinary = sqlalchemy.LargeBinary
 
 
-def create_ds(session: sqlalchemy.orm.Session) -> DataStore:  # factory
-    return _DS(session)  # session is constructed by "scoped_session" factory
+# --------------------------------------------------------------------------------------------
+#
+# ======== How to obtain "session" for "create_ds(session: sqlalchemy.orm.Session)" =========
+#
+# --------------------------------------------------------------------------------------------
+#
+#       Scenario 1. Using "scoped_session":
+#
+# https://docs.sqlalchemy.org/en/13/orm/contextual.html
+#
+# >>> session_factory = sessionmaker(bind=some_engine)
+# >>> Session = scoped_session(session_factory)
+#
+# The scoped_session object we've created will now call upon the sessionmaker when we "call" the registry:
+#
+# >>> some_session = Session()
+#
+# === panedrone: ^^^ "some_session" will be of type "sqlalchemy.orm.Session".
+#
+# --------------------------------------------------------------------------------------------
+#
+#       Scenario 2. Using "sessionmaker" without "scoped_session":
+#
+# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+#
+# https://dassum.medium.com/building-rest-apis-using-fastapi-sqlalchemy-uvicorn-8a163ccf3aa1
+#
+# # Dependency
+# def get_db():
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
+#
+# ^^ get_db() can be used to create independent database session for each request.
+#
+# === panedrone:
+#
+# # Dependency
+# def get_ds() -> DataStore:
+#     session = SessionLocal()  # "session" will be of type "sqlalchemy.orm.Session"
+#     try:
+#         yield create_ds(session)
+#     finally:
+#         session.close()
+# .......................
+#
+# @app.get('/api/projects/{p_id}', tags=["Project"], response_model=schemas.SchemaProject)
+# def project_read(p_id: int, ds: DataStore = Depends(get_ds)):
+#     return ProjectsDaoEx(ds).read_project(p_id)
+#
+# --------------------------------------------------------------------------------------------
+#
+#       Scenario 3. The same as Scenario 2, but using "try...finally" instead of "yield" + "Depends":
+#
+# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+#
+# orm_session = SessionLocal()
+# try:
+#     ds = create_ds(orm_session)
+#     dao = RequestLogDao(ds)
+#     products = dao.get_log()
+#     for p in products:
+#         print(f"{p.id}\t{p.event_time}\t{p.user_ip}\t{p.request_uri}")
+# finally:
+#     orm_session.close()
+#
+# --------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
+#
+#       For Scenarios 1,2,3, the "engine" object is created this way:
+#
+# ... sqlite .........................................................
+#
+# SQLALCHEMY_DATABASE_URL = "sqlite:///./data.db"
+#
+# engine = create_engine(
+#     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False},echo=True
+# )
+# ... postgresql .....................................................
+#
+# engine = sqlalchemy.create_engine('postgresql://postgres:sa@localhost/my-tests')
+#
+# ... mysql ..........................................................
+#
+# https://www.tutorialguruji.com/dbms/how-do-i-execute-a-mysql-stored-procedure-in-a-sqlalchemy-scoped-session-to-return-a-single-result-set-of-data-for-flask-web-app/
+#
+# engine = sqlalchemy.create_engine('mysql+mysqlconnector://root:root@localhost/sakila')
+#
+# ... oracle .........................................................
+#
+# user = 'MY_TESTS'
+# pwd = 'sa'
+# dsn = cx_Oracle.makedsn(
+#     'localhost', 1521,
+#     service_name="orcl"
+#     # service_name="XE"
+# )
+# engine = sqlalchemy.create_engine(f'oracle+cx_oracle://{user}:{pwd}@{dsn}', echo=False)
+#
+# --------------------------------------------------------------------------------------------
+
+def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
+    return _DS(orm_session)
 
 
 class _DS(DataStore):
@@ -205,12 +332,12 @@ class _DS(DataStore):
         postgresql = 3
         oracle = 4
 
-    def __init__(self, session: sqlalchemy.orm.Session):
+    def __init__(self, orm_session: sqlalchemy.orm.Session):
         self.conn = None
         self.transaction = None
         self.engine = None
-        self.engine_type = self.EngineType.sqlite3
-        self.session: sqlalchemy.orm.session = session
+        self.engine_type = self.EngineType.sqlite3  # === panedrone:
+        self.session: sqlalchemy.orm.session = orm_session
 
     def begin(self):
         if self.transaction is None:
@@ -238,22 +365,11 @@ class _DS(DataStore):
         self.transaction = None
 
     def get_all_raw(self, cls, params=None) -> []:
-        # https://stackoverflow.com/questions/17972020/how-to-execute-raw-sql-in-flask-sqlalchemy-app
-        # user = session.query(User).from_statement(
-        #     text("""SELECT * FROM users where name=:name""")
-        # ).params(name="ed").all()
-
-        # query = self.ds.engine.execute(GroupExModel.SQL) # it returns an array of tuples
-        # return query.all()
         """
-        get_all_raw
         :param cls: An __abstract_ model class or plain DTO class containing a static field "SQL"
-        :param params: [] the values of SQL params
-        :return: [dict]: an array of dict like [{'g_id': 21, 'g_name': 'Project 1'}, {'g_id': 22, 'g_name': 'Project 2']
+        :param params: []: the values of SQL params
+        :return: [cls]: an array of of 'cls' objects
         """
-        # rows = self.engine.execute(cls.SQL)  # .fetchall()
-        # performs -->
-        # connection = self.connect(close_with_result=True) ---- no need because of connected
         if params is None:
             params = []
 
@@ -263,7 +379,8 @@ class _DS(DataStore):
         exec_res = self._exec(cls.SQL, params)
         try:
             raw_cursor = exec_res.cursor
-            col_names = [tup[0] for tup in raw_cursor.description]
+            # === panedrone: lower() is required because of oracle column names are always in upper case
+            col_names = [tup[0].lower() for tup in raw_cursor.description]
             res = []
             for row in exec_res:
                 row_values = [i for i in row]
