@@ -18,6 +18,7 @@
 import sqlalchemy.orm
 from sqlalchemy import text
 
+
 # from sqlalchemy.dialects import oracle
 
 
@@ -219,8 +220,14 @@ LargeBinary = sqlalchemy.LargeBinary
 
 
 # --------------------------------------------------------------------------------------------
+
+def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
+    return _DS(orm_session)
+
+
+# --------------------------------------------------------------------------------------------
 #
-# ======== How to obtain "session" for "create_ds(session: sqlalchemy.orm.Session)" =========
+#      ^^ How to obtain "orm_session" for "create_ds(orm_session: sqlalchemy.orm.Session)"
 #
 # --------------------------------------------------------------------------------------------
 #
@@ -243,27 +250,27 @@ LargeBinary = sqlalchemy.LargeBinary
 #
 # SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 #
-# https://dassum.medium.com/building-rest-apis-using-fastapi-sqlalchemy-uvicorn-8a163ccf3aa1
+# # https://dassum.medium.com/building-rest-apis-using-fastapi-sqlalchemy-uvicorn-8a163ccf3aa1
+# #
+# # # Dependency
+# # def get_db():
+# #     db = SessionLocal()
+# #     try:
+# #         yield db
+# #     finally:
+# #         db.close()
+# #
+# # ^^ get_db() can be used to create independent database orm_session for each request.
 #
-# # Dependency
-# def get_db():
-#     db = SessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
-#
-# ^^ get_db() can be used to create independent database session for each request.
-#
-# === panedrone:
+# # === panedrone:
 #
 # # Dependency
 # def get_ds() -> DataStore:
-#     session = SessionLocal()  # "session" will be of type "sqlalchemy.orm.Session"
+#     orm_session = SessionLocal()  # "orm_session" will be of type "sqlalchemy.orm.Session"
 #     try:
-#         yield create_ds(session)
+#         yield create_ds(orm_session)
 #     finally:
-#         session.close()
+#         orm_session.close()
 # .......................
 #
 # @app.get('/api/projects/{p_id}', tags=["Project"], response_model=schemas.SchemaProject)
@@ -287,9 +294,10 @@ LargeBinary = sqlalchemy.LargeBinary
 #     orm_session.close()
 #
 # --------------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------------
 #
-#       For Scenarios 1,2,3, the "engine" object is created this way:
+#       ^^^ How to obtain the "engine" object for Scenarios 1,2,3:
+#
+# --------------------------------------------------------------------------------------------
 #
 # ... sqlite .........................................................
 #
@@ -321,10 +329,6 @@ LargeBinary = sqlalchemy.LargeBinary
 #
 # --------------------------------------------------------------------------------------------
 
-def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
-    return _DS(orm_session)
-
-
 class _DS(DataStore):
     class EngineType:
         sqlite3 = 1
@@ -333,36 +337,38 @@ class _DS(DataStore):
         oracle = 4
 
     def __init__(self, orm_session: sqlalchemy.orm.Session):
-        self.conn = None
-        self.transaction = None
-        self.engine = None
-        self.engine_type = self.EngineType.sqlite3  # === panedrone:
-        self.session: sqlalchemy.orm.session = orm_session
+
+        self.orm_session: sqlalchemy.orm.session = orm_session
+
+        conn = self.orm_session.connection()
+
+        driver_name = conn.engine.url.drivername.lower()
+
+        if 'sqlite' in driver_name:
+            self.engine_type = self.EngineType.sqlite3
+            return
+        if 'mysql' in driver_name:
+            self.engine_type = self.EngineType.mysql
+            return
+        if 'postgresql' in driver_name:
+            self.engine_type = self.EngineType.postgresql
+            return
+        if 'oracle' in driver_name:
+            self.engine_type = self.EngineType.oracle
+            return
+
+        raise Exception('Unexpected: ' + driver_name)
 
     def begin(self):
-        if self.transaction is None:
-            # https://docs.sqlalchemy.org/en/14/orm/session_transaction.html
-            self.session.begin()
-            return
-        # https://docs.sqlalchemy.org/en/14/core/connections.html
-        self.transaction = self.conn.begin()
+        # https://docs.sqlalchemy.org/en/14/orm/session_transaction.html
+        self.orm_session.begin()
 
     def commit(self):
-        if self.transaction is None:
-            self.session.commit()
-            return
-        # https://docs.sqlalchemy.org/en/14/core/connections.html
-        self.transaction.commit()
-        self.transaction = None
+        self.orm_session.commit()
 
     def rollback(self):
-        if self.transaction is None:
-            # https://docs.sqlalchemy.org/en/14/orm/session_basics.html
-            self.session.rollback()
-            return
-        # https://docs.sqlalchemy.org/en/14/core/connections.html
-        self.transaction.rollback()
-        self.transaction = None
+        # https://docs.sqlalchemy.org/en/14/orm/session_basics.html
+        self.orm_session.rollback()
 
     def get_all_raw(self, cls, params=None) -> []:
         """
@@ -400,10 +406,10 @@ class _DS(DataStore):
         return 'More than 1 row exists'
 
     def get_query(self, cls):
-        return self.session.query(cls)
+        return self.orm_session.query(cls)
 
     def filter(self, cls, params: dict):
-        return self.session.query(cls).filter_by(**params)
+        return self.orm_session.query(cls).filter_by(**params)
 
     def delete_by_filter(self, cls, params: dict) -> int:
         found = self.filter(cls, params)
@@ -416,25 +422,25 @@ class _DS(DataStore):
         return found.update(values=data)  # found is a BaseQuery, no fetch!
 
     def create_one(self, entity) -> None:
-        self.session.add(entity)  # return None
-        self.session.flush()
+        self.orm_session.add(entity)  # return None
+        self.orm_session.flush()
 
     def read_all(self, cls):
-        return self.session.query(cls).all()
+        return self.orm_session.query(cls).all()
 
     def read_one(self, cls, pk: dict):
-        return self.session.query(cls).get(pk)
+        return self.orm_session.query(cls).get(pk)
 
     def update_one(self, cls, data: dict, pk: dict) -> int:
         rc = self.update_by_filter(cls, data, pk)
-        self.session.flush()
+        self.orm_session.flush()
         return rc
 
     def delete_one(self, cls, pk: dict) -> int:
         # found = self.read_one(cls, params) # found is an entity of class cls
-        # self.session.delete(found)
+        # self.orm_session.delete(found)
         rc = self.delete_by_filter(cls, pk)  # no fetch!
-        self.session.flush()
+        self.orm_session.flush()
         return rc
 
     def _exec(self, sql, params):
@@ -445,7 +451,7 @@ class _DS(DataStore):
         """
         pp = tuple(params)
         txt = text(sql)  # don't use sqlalchemy.text(sql) with '%' as params
-        return self.session.execute(txt, pp)
+        return self.orm_session.execute(txt, pp)
 
     def _exec_proc_pg(self, sql, params):
         out_params = []
@@ -470,7 +476,7 @@ class _DS(DataStore):
     def _exec_sp_mysql(self, sp, params):
         call_params = self._get_call_params(params)
         # https://stackoverflow.com/questions/45979950/sqlalchemy-error-when-calling-mysql-stored-procedure
-        raw_conn = self.session.connection()
+        raw_conn = self.orm_session.connection()
         try:
             with raw_conn.cursor() as cursor:
                 result_args = cursor.callproc(sp, call_params)
@@ -489,7 +495,7 @@ class _DS(DataStore):
     def _query_sp_mysql(self, sp, on_result, params):
         call_params = self._get_call_params(params)
         # https://stackoverflow.com/questions/45979950/sqlalchemy-error-when-calling-mysql-stored-procedure
-        raw_conn = self.session.connection()
+        raw_conn = self.orm_session.connection()
         try:
             with raw_conn.cursor() as cursor:
                 # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
@@ -560,16 +566,27 @@ class _DS(DataStore):
         return 'More than 1 row exists'
 
     def query_all_rows(self, sql, params, callback):
+
         sql = self._format_sql(sql)
         sp = self._get_sp_name(sql)
+
         if sp is None:
-            cursor = self._exec(sql, params)
+            exec_res = self._exec(sql, params)
             try:
-                for row in cursor:
-                    callback(row)
+                raw_cursor = exec_res.cursor
+                # === panedrone:
+                #       the same logic is used in get_all_raw(...,
+                #       but tup[0].lower() should not be used in here
+                #       and col_names must be used as-is:
+                col_names = [tup[0] for tup in raw_cursor.description]
+                for row in exec_res:
+                    row_values = [i for i in row]
+                    row_as_dict = dict(zip(col_names, row_values))
+                    callback(row_as_dict)
                 return
             finally:
-                cursor.close()
+                exec_res.close()
+
         if self.engine_type != self.EngineType.mysql:
             raise Exception('Not supported for this engine')
         self._query_sp_mysql(sp, lambda result: self._fetch_all(result, callback), params)
