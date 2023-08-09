@@ -3,6 +3,7 @@
     It demonstrates how to implement an interface DataStore in Python + SQLAlchemy.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
+    Demo project: https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy
 
     Successfully tested with:
         - sqlite3 ---------------- built-in
@@ -28,11 +29,14 @@ class OutParam:
 
 class DataStore:
 
-    def begin(self): pass
+    def begin(self):
+        pass
 
-    def commit(self): pass
+    def commit(self):
+        pass
 
-    def rollback(self): pass
+    def rollback(self):
+        pass
 
     # ORM-based raw-SQL helpers
 
