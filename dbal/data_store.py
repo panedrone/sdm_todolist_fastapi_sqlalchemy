@@ -434,7 +434,10 @@ class _DS(DataStore):
         return self.orm_session.query(cls).all()
 
     def read_one(self, cls, pk: dict):
-        return self.orm_session.query(cls).get(pk)
+        res = self.orm_session.query(cls).get(pk)
+        if not isinstance(res, cls):
+            raise Exception(f"Unexpected ret-value: {res}")
+        return res
 
     def update_one(self, cls, data: dict, pk: dict) -> int:
         rc = self.update_by_filter(cls, data, pk)
