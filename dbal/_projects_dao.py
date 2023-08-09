@@ -21,6 +21,13 @@ class _ProjectsDao:
         """
         self.ds.create_one(p)
 
+    def read_project_list(self):
+        """
+        C(R)UD: projects
+        :return: list[Project]
+        """
+        return self.ds.read_all(Project)
+
     def read_project(self, p_id):
         """
         C(R)UD: projects

@@ -2,11 +2,6 @@
 <dao-class xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="dao.xsd">
 
-    <crud dto="sa-Project">
-        <create/>
-        <read/>
-        <update/>
-        <delete/>
-    </crud>
+    <crud dto="sa-Project"/>
 
 </dao-class>
