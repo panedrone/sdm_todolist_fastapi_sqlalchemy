@@ -3,7 +3,6 @@
     It demonstrates how to implement an interface DataStore in Python + SQLAlchemy.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
-    Demo project: https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy
 
     Successfully tested with:
         - sqlite3 ---------------- built-in
@@ -13,6 +12,7 @@
 
     Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
+    Demo project: https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy
 
 """
 
