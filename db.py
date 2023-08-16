@@ -18,6 +18,9 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
+# https://dassum.medium.com/building-rest-apis-using-fastapi-sqlalchemy-uvicorn-8a163ccf3aa1
+# get_db() can be used to create independent database session for each request.
+
 # Dependency
 def get_ds() -> DataStore:
     # seems like it is from here:
