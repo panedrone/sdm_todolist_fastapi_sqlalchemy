@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<dto-classes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:noNamespaceSchemaLocation="dto.xsd">
+<sdm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="sdm.xsd">
 
     <dto-class name="sa-Project" ref="projects"/>
 
@@ -19,4 +19,16 @@
 
     </dto-class>
 
-</dto-classes>
+    <dao-class name="_ProjectsDao">
+
+        <crud dto="sa-Project"/>
+
+    </dao-class>
+
+    <dao-class name="_TasksDao">
+
+        <crud dto="sa-Task"/>
+
+    </dao-class>
+
+</sdm>
