@@ -10,7 +10,7 @@ dto.xml
 
 ```xml
 
-<dto-classes>
+<sdm>
 
     <dto-class name="sa-Project" ref="projects"/>
 
@@ -29,29 +29,15 @@ dto.xml
 
     </dto-class>
 
-</dto-classes>
-```
+    <dao-class name="_ProjectsDao">
+        <crud dto="sa-Project"/>
+    </dao-class>
 
-ProjectsDao.xml
+    <dao-class name="_TasksDao">
+        <crud dto="sa-Task"/>
+    </dao-class>
 
-```xml
-
-<dao-class>
-
-    <crud dto="sa-Project"/>
-
-</dao-class>
-```
-
-TasksDao.xml
-
-```xml
-
-<dao-class>
-
-    <crud dto="sa-Task"/>
-
-</dao-class>
+</sdm>
 ```
 
 Generated code in action:

@@ -9,26 +9,19 @@
     <dto-class name="sa-Task" ref="tasks"/>
 
     <dto-class name="sa-TaskLi" ref="tasks">
-
         <header><![CDATA[    """
     Task list item
     """
     __table_args__ = {'extend_existing': True}]]></header>
-
         <field column="t_comments" type="-"/>
-
     </dto-class>
 
     <dao-class name="_ProjectsDao">
-
         <crud dto="sa-Project"/>
-
     </dao-class>
 
     <dao-class name="_TasksDao">
-
         <crud dto="sa-Task"/>
-
     </dao-class>
 
 </sdm>
