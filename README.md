@@ -4,7 +4,7 @@ Quick Demo of how to use [SQL DAL Maker](https://github.com/panedrone/sqldalmake
 
 Front-end is written in Vue.js, SQLite3 is used as a database.
 
-![demo-go.png](demo-go.png)
+![sdm-todo-app.png](sdm-todo-app.png)
 
 dto.xml
 
